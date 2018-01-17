@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FlewsePropLoaded>true</FlewsePropLoaded>
+  </PropertyGroup>
+  <!--
+    Notes:
+    
+    GraphicsMagick may cause some issues. The DLLs are precompiled as well as the .lib files. Currently
+    this project has a ConfigurationType of Utility.
+    
+    Should add this to all and make sure each project uses it:
+    <AdditionalLibraryDirectories>;$(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+  -->
+  <!-- Temporary Condition until all bugs worked out -->
+  <PropertyGroup>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='Win32|Application'">$(SolutionDir)Bin\$(Configuration)_x86\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='x64|Application'">$(SolutionDir)Bin\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='Win32|DynamicLibrary'">$(SolutionDir)Bin\$(Configuration)_x86\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='x64|DynamicLibrary'">$(SolutionDir)Bin\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='Win32|Utility'">$(SolutionDir)Bin\$(Configuration)_x86\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='x64|Utility'">$(SolutionDir)Bin\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='Win32|StaticLibrary'">$(SolutionDir)Lib\$(Configuration)_$(Platform)\</OutDir>
+    <OutDir Condition="'$(Platform)|$(ConfigurationType)'=='x64|StaticLibrary'">$(SolutionDir)Lib\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\$(ProjectFileName)\$(Configuration)_$(Platform)\</IntDir>
+    <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(SolutionDir)\Lib\$(Configuration)_$(Platform)\;$(SolutionDir)Bin\$(Configuration)\;$(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(SolutionDir)\Lib\$(Configuration)_$(Platform)\;$(SolutionDir)Bin\$(Configuration)_x86\;$(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <ClCompile>
+      <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+	<Link>
+      <ImportLibrary>$(SolutionDir)Lib\$(Configuration)_$(Platform)\$(TargetName).lib</ImportLibrary>
+	</Link>
+    <ClCompile>
+      <!-- If the envt var SECRET_SOURCE exists and points at the secret source tree,
+           We define define the build time symbol SECRET_BUILD, and add secret_source to the #include path for all projects. 
+           Conditional compilation and linking can then be done using SECRET_BUILD with #define and #pragma comment(lib). 
+           thus allowing conditional activation of secret code on secret network. 
+           We can now also include header files from secret_source. 
+           If you set SECRET_SOURCE, you need to build the Secret source tree with its own solution file before FLEWSE will link. 
+           The secret source solution knows how to deliver all binaries to FLEWSE so linking can occur correctly -->
+      <PreprocessorDefinitions Condition="Exists($(SECRET_SOURCE))">%(PreprocessorDefinitions);SECRET_BUILD</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="Exists($(SECRET_SOURCE))">$(SECRET_SOURCE);%(AdditonalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
