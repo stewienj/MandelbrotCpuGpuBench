@@ -216,7 +216,7 @@ namespace Mandelbrot
 
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
-                render((float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)step);
+                render((float)xmin, (float)xmax, (float)ymin, (float)ymax, (float)step, 1000);
                 ElapsedTime = timer.ElapsedMilliseconds;
                 abort = false;
                 done = true;

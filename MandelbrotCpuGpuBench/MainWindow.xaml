@@ -6,7 +6,21 @@
         xmlns:local="clr-namespace:MandelbrotCpuGpuBench"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+    <Grid 
+      DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Workspace}"
+      MouseMove="Grid_MouseMove"
+      MouseWheel="Grid_MouseWheel"
+      MouseDown="Grid_MouseDown"
+      MouseUp="Grid_MouseUp"
+      SizeChanged="Grid_SizeChanged"
+      >
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition/>
+    </Grid.RowDefinitions>
+    <Grid Grid.Row="2" x:Name="_image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Image Source="{Binding MandelbrotImage}" />
     </Grid>
+  </Grid>
 </Window>

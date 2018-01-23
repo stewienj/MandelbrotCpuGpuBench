@@ -15,7 +15,7 @@ namespace Algorithms
     protected const double limit = 4.0;
 
     // Render the fractal using the BCL Complex data type abstraction on a single thread with scalar doubles
-    public void RenderSingleThreadedWithADT(double xmin, double xmax, double ymin, double ymax, double step)
+    public void RenderSingleThreadedWithADT(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations)
     {
       int yp = 0;
       for (double y = ymin; y < ymax && !Abort; y += step, yp++)
@@ -33,7 +33,7 @@ namespace Algorithms
             accum += num;
             iters++;
             sqabs = accum.SquareAbs();
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
 
           DrawPixel(xp, yp, iters);
         }
@@ -41,7 +41,7 @@ namespace Algorithms
     }
 
     // Render the fractal with no data type abstraction on a single thread with scalar doubles
-    public void RenderSingleThreadedNoADT(double xmin, double xmax, double ymin, double ymax, double step)
+    public void RenderSingleThreadedNoADT(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations)
     {
       int yp = 0;
       for (double y = ymin; y < ymax && !Abort; y += step, yp++)
@@ -61,7 +61,7 @@ namespace Algorithms
             accumy = naccumy + y;
             iters++;
             sqabs = accumx * accumx + accumy * accumy;
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
 
           DrawPixel(xp, yp, iters);
         }
@@ -69,7 +69,7 @@ namespace Algorithms
     }
 
     // Render the fractal using the BCL Complex data type abstraction on multiple threads with scalar doubles
-    public void RenderMultiThreadedWithADT(double xmin, double xmax, double ymin, double ymax, double step)
+    public void RenderMultiThreadedWithADT(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations)
     {
       Parallel.For(0, (int)(((ymax - ymin) / step) + .5), (yp) =>
       {
@@ -89,7 +89,7 @@ namespace Algorithms
             accum += num;
             iters++;
             sqabs = accum.SquareAbs();
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
 
           DrawPixel(xp, yp, iters);
         }
@@ -97,7 +97,7 @@ namespace Algorithms
     }
 
     // Render the fractal with no data type abstraction on multiple threads with scalar doubles
-    public void RenderMultiThreadedNoADT(double xmin, double xmax, double ymin, double ymax, double step)
+    public void RenderMultiThreadedNoADT(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations)
     {
       Parallel.For(0, (int)(((ymax - ymin) / step) + .5), (yp) =>
       {
@@ -119,7 +119,7 @@ namespace Algorithms
             accumy = naccumy + y;
             iters++;
             sqabs = accumx * accumx + accumy * accumy;
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
 
           DrawPixel(xp, yp, iters);
         }

@@ -4,11 +4,12 @@ namespace Algorithms
 {
   public abstract class FractalRenderer
   {
-    public delegate void Render(double xmin, double xmax, double ymin, double ymax, double step);
+    public delegate void Render(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations);
 
     private Func<bool> abort;
     private Action<int, int, int> drawPixel;
-    protected const int max_iters = 1000; // Make this higher to see more detail when zoomed in (and slow down rendering a lot)
+    //public int maxIterations = 1000; // Make this higher to see more detail when zoomed in (and slow down rendering a lot)
+     
 
     protected FractalRenderer(Action<int, int, int> draw, Func<bool> checkAbort)
     {

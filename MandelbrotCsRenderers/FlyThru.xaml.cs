@@ -215,7 +215,7 @@ namespace Mandelbrot
         ymin = yc - (ch * step / 2);
         ymax = yc + (ch * step / 2);
         // Render this frame
-        render(xmin, xmax, ymin, ymax, step);
+        render(xmin, xmax, ymin, ymax, step,1000);
         // Frame's complete: publish the current buffer for the
         // render thread to draw
         bytes = Interlocked.Exchange(ref toImage, bytes);

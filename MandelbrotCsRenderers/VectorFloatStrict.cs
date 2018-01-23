@@ -26,7 +26,7 @@ namespace Algorithms
 
     // Render the fractal on multiple threads using the ComplexFloatVec data type
     // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-    public void RenderMultiThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderMultiThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -35,7 +35,7 @@ namespace Algorithms
       float ymax = (float)ymaxd;
       float step = (float)stepd;
 
-      Vector<float> vmax_iters = new Vector<float>((float)max_iters);
+      Vector<float> vmax_iters = new Vector<float>((float)maxIterations);
       Vector<float> vlimit = new Vector<float>(limit);
       Vector<float> vstep = new Vector<float>(step);
       Vector<float> vinc = new Vector<float>((float)Vector<float>.Count * step);
@@ -72,7 +72,7 @@ namespace Algorithms
 
     // Render the fractal on multiple threads using raw Vector<float> data types
     // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-    public void RenderMultiThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderMultiThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -81,7 +81,7 @@ namespace Algorithms
       float ymax = (float)ymaxd;
       float step = (float)stepd;
 
-      Vector<float> vmax_iters = new Vector<float>((float)max_iters);
+      Vector<float> vmax_iters = new Vector<float>((float)maxIterations);
       Vector<float> vlimit = new Vector<float>(limit);
       Vector<float> vstep = new Vector<float>(step);
       Vector<float> vinc = new Vector<float>((float)Vector<float>.Count * step);
@@ -122,7 +122,7 @@ namespace Algorithms
 
     // Render the fractal on a single thread using the ComplexFloatVec data type
     // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-    public void RenderSingleThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderSingleThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -131,7 +131,7 @@ namespace Algorithms
       float ymax = (float)ymaxd;
       float step = (float)stepd;
 
-      Vector<float> vmax_iters = new Vector<float>((float)max_iters);
+      Vector<float> vmax_iters = new Vector<float>((float)maxIterations);
       Vector<float> vlimit = new Vector<float>(limit);
       Vector<float> vstep = new Vector<float>(step);
       Vector<float> vxmax = new Vector<float>(xmax);
@@ -166,7 +166,7 @@ namespace Algorithms
 
     // Render the fractal on a single thread using raw Vector<float> data types
     // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-    public void RenderSingleThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderSingleThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -175,7 +175,7 @@ namespace Algorithms
       float ymax = (float)ymaxd;
       float step = (float)stepd;
 
-      Vector<float> vmax_iters = new Vector<float>(max_iters);
+      Vector<float> vmax_iters = new Vector<float>((float)maxIterations);
       Vector<float> vlimit = new Vector<float>(limit);
       Vector<float> vstep = new Vector<float>(step);
       Vector<float> vxmax = new Vector<float>(xmax);

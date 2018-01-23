@@ -14,7 +14,7 @@ namespace Algorithms
     protected const float limit = 4.0f;
 
     // Render the fractal using a Complex data type on a single thread with scalar floats
-    public void RenderSingleThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderSingleThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -39,7 +39,7 @@ namespace Algorithms
             accum += num;
             iters++;
             sqabs = accum.SquareAbs();
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
 
           DrawPixel(xp, yp, iters);
         }
@@ -47,7 +47,7 @@ namespace Algorithms
     }
 
     // Render the fractal with no data type abstraction on a single thread with scalar floats
-    public void RenderSingleThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderSingleThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -74,14 +74,14 @@ namespace Algorithms
             accumy = naccumy + y;
             iters++;
             sqabs = accumx * accumx + accumy * accumy;
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
           DrawPixel(xp, yp, iters);
         }
       }
     }
 
     // Render the fractal using a Complex data type on a single thread with scalar floats
-    public void RenderMultiThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderMultiThreadedWithADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -108,7 +108,7 @@ namespace Algorithms
                   accum += num;
                   iters++;
                   sqabs = accum.SquareAbs();
-                } while (sqabs < limit && iters < max_iters);
+                } while (sqabs < limit && iters < maxIterations);
 
                 DrawPixel(xp, yp, iters);
               }
@@ -116,7 +116,7 @@ namespace Algorithms
     }
 
     // Render the fractal with no data type abstraction on multiple threads with scalar floats
-    public void RenderMultiThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd)
+    public void RenderMultiThreadedNoADT(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, double maxIterations)
     {
 
       float xmin = (float)xmind;
@@ -145,7 +145,7 @@ namespace Algorithms
             accumy = naccumy + y;
             iters++;
             sqabs = accumx * accumx + accumy * accumy;
-          } while (sqabs < limit && iters < max_iters);
+          } while (sqabs < limit && iters < maxIterations);
 
           DrawPixel(xp, yp, iters);
         }
