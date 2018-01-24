@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MandelbrotCpuGpuBench", "MandelbrotCpuGpuBench\MandelbrotCpuGpuBench.csproj", "{8BFB1A0E-2551-46F8-AFF1-4C50C310B8C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C286990F-E3BC-4423-979B-D9703304E96F} = {C286990F-E3BC-4423-979B-D9703304E96F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MandelbrotCsRenderers", "MandelbrotCsRenderers\MandelbrotCsRenderers.csproj", "{90648122-BCC7-478C-998B-65E91D6DC7C3}"
 EndProject

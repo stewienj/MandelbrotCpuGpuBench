@@ -5,7 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MandelbrotCpuGpuBench"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="{Binding RelativeSource={RelativeSource Self}, Path=Workspace.Title}" Height="350" Width="525">
+  <Window.Resources>
+    <Style TargetType="RadioButton">
+      <Setter Property="Margin" Value="1,0"/>
+    </Style>
+    <Style TargetType="Border">
+      <Setter Property="BorderBrush" Value="Black"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+  </Window.Resources>
     <Grid 
       DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Workspace}"
       MouseMove="Grid_MouseMove"
@@ -13,13 +23,50 @@
       MouseDown="Grid_MouseDown"
       MouseUp="Grid_MouseUp"
       SizeChanged="Grid_SizeChanged"
+      Background="LightGray"
       >
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
       <RowDefinition/>
     </Grid.RowDefinitions>
-    <Grid Grid.Row="2" x:Name="_image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <StackPanel Grid.Row="0" Orientation="Horizontal">
+      
+      <!-- Language -->
+      <Border>
+        <UniformGrid Rows="2">
+          <RadioButton IsChecked="{Binding LanguageCs}">C#</RadioButton>
+          <RadioButton IsChecked="{Binding LanguageCpp}">C++</RadioButton>
+        </UniformGrid>
+      </Border>
+
+      <!-- Thread Model -->
+      <Border>
+        <UniformGrid Rows="2">
+          <RadioButton IsChecked="{Binding ThreadModelMulti}">Multi Threaded</RadioButton>
+          <RadioButton IsChecked="{Binding ThreadModelSingle}">Single Threaded</RadioButton>
+        </UniformGrid>
+      </Border>
+
+      <!-- Precision -->
+      <Border>
+        <UniformGrid Rows="2">
+          <RadioButton IsChecked="{Binding PrecisionFloat}">Float</RadioButton>
+          <RadioButton IsChecked="{Binding PrecisionDouble}">Double</RadioButton>
+        </UniformGrid>
+      </Border>
+
+      <!-- Method -->
+      <Border>
+        <UniformGrid Rows="2" Columns="2">
+          <RadioButton IsChecked="{Binding MethodCpuSimd}" IsEnabled="{Binding MethodCpuSimdEnabled}">CPU SIMD</RadioButton>
+          <RadioButton IsChecked="{Binding MethodCpuFpu}">CPU FPU</RadioButton>
+          <RadioButton  IsChecked="{Binding MethodGpu}" IsEnabled="{Binding MethodGpuEnabled}">GPU</RadioButton>
+        </UniformGrid>
+      </Border>
+
+      <Button Click="Render_Click">Render Current View</Button>
+    </StackPanel>
+    <Grid Grid.Row="1" x:Name="_image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <Image Source="{Binding MandelbrotImage}" />
     </Grid>
   </Grid>

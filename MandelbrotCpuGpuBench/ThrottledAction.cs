@@ -25,6 +25,10 @@ namespace MandelbrotCpuGpuBench
 
     }
 
+    public void Join()
+    {
+      _actionTask.Wait();
+    }
     /// <summary>
     /// Invokes the action on another thread at the appropriate time in the future
     /// </summary>
@@ -38,13 +42,14 @@ namespace MandelbrotCpuGpuBench
     /// </summary>
     public void InvokeAction(Action action)
     {
+      _action = action;
       if (_actionsQueued < 1)
       {
         Interlocked.Increment(ref _actionsQueued);
         _actionTask = _actionTask.ContinueWith((t) =>
         {
           Interlocked.Decrement(ref _actionsQueued);
-          action();
+          _action();
           using (var manualResetEvent = new ManualResetEvent(false))
           {
             manualResetEvent.WaitOne(_timeBetweenInvokations);

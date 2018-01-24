@@ -63,11 +63,6 @@
     <Image Include="res\Mandelbrot.ico" />
     <Image Include="res\Toolbar.bmp" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\ThirdParty\DirectXSDK2010\DLL\x64\DirectX_DLLs_x64.csproj">
-      <Project>{4a0215fd-7fd8-4f68-b08e-81d7d81edb64}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

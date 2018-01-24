@@ -8,24 +8,26 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using Algorithms;
 using System.Windows.Media.Imaging;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace MandelbrotCpuGpuBench
 {
   public class Workspace: INotifyPropertyChanged
   {
-    // TODO: Add double buffering. Should have current, pending (last rendered), and a list of spares (ideally 1) that can be handed off for rendering to
-    // current gets replaced by pending when the CopyPixels is called 
-
-
     private double _zoomLevel = 0.001;
     private double _viewR = 0.001643721971153;
     private double _viewI = 0.822467633298876;
     private int _bufferWidth = 0;
     private int _bufferHeight = 0;
+    private Stopwatch _stopwatch = new Stopwatch();
 
     private ThrottledAction _throttledAction = new ThrottledAction(TimeSpan.FromMilliseconds(1));
 
     private ConcurrentStack<int[,]> _spareBuffers = new ConcurrentStack<int[,]>();
+
+    [DllImport("MandelbrotCppRenderers.dll")]
+    static extern unsafe void RenderMandelbrotCpp(bool useGpu, bool doublePrecision, bool multiThreaded, double zoomLevel, double r, double i, int* pBuffer, int bufferWidth, int bufferHeight);
 
     /// <summary>
     /// Test memory layout, have come to the conclusion that a 2D array is to be used as
@@ -94,8 +96,10 @@ namespace MandelbrotCpuGpuBench
       DoRender();
     }
 
-    public void DoRender()
+    public unsafe void DoRender()
     {
+      if (Closing)
+        return;
       int width = _bufferWidth;
       int height = _bufferHeight;
 
@@ -111,7 +115,7 @@ namespace MandelbrotCpuGpuBench
       }
 
       int maxiter = (int)(-512 * Math.Log10(_zoomLevel));
-      Func<int, (byte R, byte G, byte B)> itersToColor = FractalRenderer.GetColorProviderV2(maxiter+1);
+      Func<int, (byte R, byte G, byte B)> itersToColor = FractalRenderer.GetColorProviderV2(maxiter + 1);
       Action<int, int, int> addPixel = (x, y, iters) =>
       {
         if (y >= height || x >= width)
@@ -129,29 +133,108 @@ namespace MandelbrotCpuGpuBench
       double yMax = halfHeight * _zoomLevel + _viewI;
       double step = _zoomLevel;
 
-      var render = FractalRenderer.SelectRender(addPixel, () => false, true, true, true, false);
+      var render = FractalRenderer.SelectRender(addPixel, () => false, MethodCpuSimd, PrecisionDouble, ThreadModelMulti, false);
+
+      Action DoRender = null;
+
+      if (LanguageCs)
+      {
+        DoRender = () => render(xMin, xMax, yMin, yMax, step, maxiter);
+      }
+      else if (_languageCpp)
+      {
+        DoRender = () =>
+        {
+          fixed (int* fixedBuffer = buffer)
+          {
+            RenderMandelbrotCpp(MethodGpu, PrecisionDouble, ThreadModelMulti, _zoomLevel, _viewR, _viewI, fixedBuffer, width, height);
+          }
+        };
+      }
+
 
       _throttledAction.InvokeAction(() =>
       {
-        render(xMin, xMax, yMin, yMax, step, maxiter);
+        _stopwatch.Reset();
+        _stopwatch.Start();
+        DoRender();
+        _stopwatch.Stop();
+
+        Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / _zoomLevel, 1)}";
 
         var temp = (MandelbrotImage as ArrayBitmapSource)?.Buffer;
         var image = new ArrayBitmapSource(buffer);
         image.Freeze();
         MandelbrotImage = image;
-        if (temp!=null && temp.GetLength(0) == height && temp.GetLength(1) == width)
+        if (temp != null && temp.GetLength(0) == height && temp.GetLength(1) == width)
         {
           _spareBuffers.Push(temp);
         }
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MandelbrotImage)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
       });
-
     }
 
     public BitmapSource MandelbrotImage { get; set; }
+    public string Title { get; set; } = "Mandelbrot Renderer";
 
     public event EventHandler ParametersChanged;
     public event PropertyChangedEventHandler PropertyChanged;
+
+    private bool _closing = false;
+    public bool Closing
+    {
+      get => _closing;
+      set
+      {
+        _closing = value;
+        if (_closing)
+        {
+          _throttledAction.Join();
+        }
+      }
+    }
+
+    private bool _languageCs = true;
+    public bool LanguageCs
+    {
+      get => _languageCs;
+      set
+      {
+        _languageCs = value;
+        if (_languageCs && MethodGpu)
+        {
+          MethodCpuSimd = true;
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodCpuSimd)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodCpuSimdEnabled)));
+      }
+    }
+    private bool _languageCpp = false;
+    public bool LanguageCpp
+    {
+      get => _languageCpp;
+      set
+      {
+        _languageCpp = value;
+        if (_languageCpp && MethodCpuSimd)
+        {
+          MethodGpu = true;
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodGpu)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodGpuEnabled)));
+      }
+    }
+    public bool ThreadModelMulti { get; set; } = true;
+    public bool ThreadModelSingle { get; set; } = false;
+    public bool PrecisionFloat { get; set; } = true;
+    public bool PrecisionDouble { get; set; } = false;
+    public bool MethodCpuSimd { get; set; } = true;
+    public bool MethodCpuFpu { get; set; } = false;
+    public bool MethodGpu { get; set; } = false;
+    public bool MethodCpuSimdEnabled => LanguageCs;
+    public bool MethodGpuEnabled => LanguageCpp;
+
   }
 }

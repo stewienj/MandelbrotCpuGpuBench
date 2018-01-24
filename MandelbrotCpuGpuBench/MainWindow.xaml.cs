@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,12 @@ namespace MandelbrotCpuGpuBench
     public MainWindow()
     {
       InitializeComponent();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+      Workspace.Closing = true;
+      base.OnClosing(e);
     }
 
     private void Grid_MouseMove(object sender, MouseEventArgs e)
@@ -61,6 +68,12 @@ namespace MandelbrotCpuGpuBench
       Workspace.ChangeSize((int)_image.ActualWidth, (int)_image.ActualHeight);
     }
 
+    private void Render_Click(object sender, RoutedEventArgs e)
+    {
+      Workspace.DoRender();
+    }
+
     public Workspace Workspace { get; } = new Workspace();
+
   }
 }
