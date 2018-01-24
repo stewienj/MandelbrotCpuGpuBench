@@ -182,6 +182,9 @@ namespace MandelbrotCpuGpuBench
     public event EventHandler ParametersChanged;
     public event PropertyChangedEventHandler PropertyChanged;
 
+    [DllImport("kernel32", SetLastError = true)]
+    static extern bool FreeLibrary(IntPtr hModule);
+
     private bool _closing = false;
     public bool Closing
     {
@@ -192,6 +195,17 @@ namespace MandelbrotCpuGpuBench
         if (_closing)
         {
           _throttledAction.Join();
+
+          // Need for force unloading of the C++/AMP rendering DLL else we get an exception
+          foreach (ProcessModule mod in Process.GetCurrentProcess().Modules)
+          {
+            if (mod.ModuleName.ToUpper() == "MandelbrotCppRenderers.dll".ToUpper())
+            {
+              FreeLibrary(mod.BaseAddress);
+            }
+          }
+
+
         }
       }
     }
