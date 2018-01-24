@@ -27,11 +27,6 @@ namespace MandelbrotCpuGpuBench
 
     private ConcurrentStack<int[,]> _spareBuffers = new ConcurrentStack<int[,]>();
 
-    internal void ChangeSize(double width, double height)
-    {
-      throw new NotImplementedException();
-    }
-
     /// <summary>
     /// Test memory layout, have come to the conclusion that a 2D array is to be used as
     /// shown in this Test.
@@ -103,10 +98,16 @@ namespace MandelbrotCpuGpuBench
     {
       int width = _bufferWidth;
       int height = _bufferHeight;
-      // This is temporary, should have a list of reusable buffers
-      if(!_spareBuffers.TryPop(out int[,] buffer) || buffer.GetLength(0) != height || buffer.GetLength(1)!= width)
+
+      // Try and get a spare buffer
+      if (!_spareBuffers.TryPop(out int[,] buffer))
       {
         buffer = new int[height, width];
+      }
+      else if (buffer.GetLength(0) != height || buffer.GetLength(1) != width)
+      {
+        buffer = new int[height, width];
+        _spareBuffers.Clear();
       }
 
       int maxiter = (int)(-512 * Math.Log10(_zoomLevel));
@@ -115,8 +116,6 @@ namespace MandelbrotCpuGpuBench
       {
         if (y >= height || x >= width)
           return;
-
-        // Might need to flip Y
 
         var color = itersToColor(iters);
         buffer[y, x] = (color.R << 16) | (color.G << 8) | color.B;
@@ -136,27 +135,14 @@ namespace MandelbrotCpuGpuBench
       {
         render(xMin, xMax, yMin, yMax, step, maxiter);
 
-        var foo = new int[width * height];
-        int i = 0;
-        for(int y=0;y<height;++y)
-        {
-          for(int x=0; x<width; ++x)
-          {
-            foo[i] = buffer[y, x];
-            ++i;
-          }
-
-        }
-
-        var image = BitmapSource.Create(width, height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null, foo, width * 4);
+        var temp = (MandelbrotImage as ArrayBitmapSource)?.Buffer;
+        var image = new ArrayBitmapSource(buffer);
         image.Freeze();
         MandelbrotImage = image;
-        //var temp = MandelbrotImage?.Buffer;
-        //MandelbrotImage = new ArrayBitmapSource(buffer);
-        //if (temp!=null && temp.GetLength(0)==height && temp.GetLength(1)==width)
-        //{
-        //  _spareBuffers.Push(temp);
-        //}
+        if (temp!=null && temp.GetLength(0) == height && temp.GetLength(1) == width)
+        {
+          _spareBuffers.Push(temp);
+        }
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MandelbrotImage)));
       });

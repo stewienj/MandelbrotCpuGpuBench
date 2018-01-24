@@ -50,7 +50,7 @@ namespace MandelbrotCpuGpuBench
       // Not applicatble because..we store just an int array, below would use width in bytes
       //int stride = width * 3 + (width * 3) % 4;
       int start = sourceRect.Y * PixelWidth;
-      Array.Copy(_buffer, start, pixels, 0, Math.Min(PixelWidth,stride));
+      System.Buffer.BlockCopy(_buffer, start, pixels, 0, (_buffer.Length - start)<<2);
     }
   }
 }
