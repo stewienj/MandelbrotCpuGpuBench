@@ -12,8 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MandelbrotCsRenderers", "Ma
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelbrotCppRenderers", "MandelbrotCppRenderers\MandelbrotCppRenderers.vcxproj", "{C286990F-E3BC-4423-979B-D9703304E96F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelbrotBenchmarkCpp", "MandelbrotBenchmarkCpp\MandelbrotBenchmarkCpp.vcxproj", "{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -46,14 +44,6 @@ Global
 		{C286990F-E3BC-4423-979B-D9703304E96F}.Release|x64.Build.0 = Release|x64
 		{C286990F-E3BC-4423-979B-D9703304E96F}.Release|x86.ActiveCfg = Release|Win32
 		{C286990F-E3BC-4423-979B-D9703304E96F}.Release|x86.Build.0 = Release|Win32
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Debug|x64.ActiveCfg = Debug|x64
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Debug|x64.Build.0 = Debug|x64
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Debug|x86.ActiveCfg = Debug|Win32
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Debug|x86.Build.0 = Debug|Win32
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Release|x64.ActiveCfg = Release|x64
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Release|x64.Build.0 = Release|x64
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Release|x86.ActiveCfg = Release|Win32
-		{3D72AB3D-47EA-4525-A5A0-FD7DFF8BF09B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
