@@ -69,13 +69,26 @@ namespace MandelbrotCpuGpuBench
       OnParametersChanged();
     }
 
-    public void Zoom(int zDelta)
+    public void Zoom(int zDelta, Point location)
     {
+      var oldDistance = (location - new Point(_bufferWidth / 2.0, _bufferHeight / 2.0)) * _zoomLevel;
       double factor = 1.2;
+      double offset = 0;
       if (zDelta > 0)
+      {
         _zoomLevel /= factor;
+        offset = (1.0 - 1.0 / factor);
+      }
       else
+      {
         _zoomLevel *= factor;
+        offset = 1.0 - factor;
+      }
+
+      // Correct for the position of the mouse
+      _viewR += oldDistance.X * offset;
+      _viewI += oldDistance.Y * offset;
+
       OnParametersChanged();
     }
 

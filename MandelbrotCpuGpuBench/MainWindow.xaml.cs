@@ -47,7 +47,7 @@ namespace MandelbrotCpuGpuBench
     private void Grid_MouseWheel(object sender, MouseWheelEventArgs e)
     {
       Workspace.ChangeSize((int)_image.ActualWidth, (int)_image.ActualHeight);
-      Workspace.Zoom(e.Delta);
+      Workspace.Zoom(e.Delta, e.GetPosition(_image));
       
     }
 
