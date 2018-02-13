@@ -1,2 +1,7 @@
 MandelbrotCpuGpuBench/bin/
 MandelbrotCpuGpuBench/.vs/
+.vs/
+Bin/
+Intermediate/
+Lib/
+*.user

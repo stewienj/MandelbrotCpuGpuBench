@@ -39,6 +39,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FunDistances.cs" />
     <Compile Include="ThrottledAction.cs" />
     <Compile Include="Workspace.cs" />
     <Page Include="MainWindow.xaml">

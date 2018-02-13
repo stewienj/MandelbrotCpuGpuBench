@@ -21,6 +21,7 @@ namespace MandelbrotCpuGpuBench
     private int _bufferWidth = 0;
     private int _bufferHeight = 0;
     private Stopwatch _stopwatch = new Stopwatch();
+    private FunDistances _funDistances = new FunDistances();
 
     private ThrottledAction _throttledAction = new ThrottledAction(TimeSpan.FromMilliseconds(1));
 
@@ -173,7 +174,12 @@ namespace MandelbrotCpuGpuBench
         DoRender();
         _stopwatch.Stop();
 
-        Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / _zoomLevel, 1)}";
+        double fullSetPixels = 4 / _zoomLevel;
+        double meters = _funDistances.PixelsToMeters(fullSetPixels);
+
+        Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Whole Set Size = {Math.Round(meters)} meters (> {_funDistances.PixelsToFunDistance(fullSetPixels)})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / _zoomLevel, 1)}";
+
+
 
         var temp = (MandelbrotImage as ArrayBitmapSource)?.Buffer;
         var image = new ArrayBitmapSource(buffer);
