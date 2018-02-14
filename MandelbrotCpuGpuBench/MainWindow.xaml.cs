@@ -87,5 +87,6 @@ namespace MandelbrotCpuGpuBench
     {
       Workspace.FullScreen = !Workspace.FullScreen;
     }
+
   }
 }

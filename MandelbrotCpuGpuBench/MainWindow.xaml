@@ -10,6 +10,7 @@
         WindowStyle="{Binding WindowStyle}"
         ResizeMode="{Binding ResizeMode}"
         PreviewKeyDown="Window_PreviewKeyDown"
+        PreviewMouseDoubleClick="ToggleFullScreen_Click"
         Title="{Binding Title}" Height="350" Width="525">
   <Window.Resources>
     <Style TargetType="RadioButton">
