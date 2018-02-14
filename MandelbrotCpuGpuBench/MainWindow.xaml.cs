@@ -75,5 +75,17 @@ namespace MandelbrotCpuGpuBench
 
     public Workspace Workspace { get; } = new Workspace();
 
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+      if(e.Key == Key.Escape)
+      {
+        Workspace.FullScreen = false;
+      }
+    }
+
+    private void ToggleFullScreen_Click(object sender, RoutedEventArgs e)
+    {
+      Workspace.FullScreen = !Workspace.FullScreen;
+    }
   }
 }

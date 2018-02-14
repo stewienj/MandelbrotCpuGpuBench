@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MandelbrotCpuGpuBench"
         mc:Ignorable="d"
-        Title="{Binding RelativeSource={RelativeSource Self}, Path=Workspace.Title}" Height="350" Width="525">
+        DataContext="{Binding RelativeSource={RelativeSource Self}, Path=Workspace}"
+        WindowState="{Binding WindowsState}"
+        WindowStyle="{Binding WindowStyle}"
+        ResizeMode="{Binding ResizeMode}"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Title="{Binding Title}" Height="350" Width="525">
   <Window.Resources>
     <Style TargetType="RadioButton">
       <Setter Property="Margin" Value="1,0"/>
@@ -17,7 +22,6 @@
     </Style>
   </Window.Resources>
     <Grid 
-      DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Workspace}"
       MouseMove="Grid_MouseMove"
       MouseWheel="Grid_MouseWheel"
       MouseDown="Grid_MouseDown"
@@ -29,7 +33,7 @@
       <RowDefinition Height="Auto"/>
       <RowDefinition/>
     </Grid.RowDefinitions>
-    <StackPanel Grid.Row="0" Orientation="Horizontal">
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Visibility="{Binding ToolsVisibility}">
       
       <!-- Language -->
       <Border>
@@ -65,9 +69,16 @@
       </Border>
 
       <Button Click="Render_Click">Render Current View</Button>
+      <Button Click="ToggleFullScreen_Click">Toggle Full Screen</Button>
     </StackPanel>
     <Grid Grid.Row="1" x:Name="_image" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    <Image Source="{Binding MandelbrotImage}" />
+      <Image Source="{Binding MandelbrotImage}">
+        <Image.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Toggle Fullscreen" Click="ToggleFullScreen_Click"/>
+          </ContextMenu>
+        </Image.ContextMenu>
+      </Image>
     </Grid>
   </Grid>
 </Window>

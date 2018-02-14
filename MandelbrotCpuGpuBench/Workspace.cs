@@ -223,8 +223,6 @@ namespace MandelbrotCpuGpuBench
               FreeLibrary(mod.BaseAddress);
             }
           }
-
-
         }
       }
     }
@@ -269,5 +267,55 @@ namespace MandelbrotCpuGpuBench
     public bool MethodCpuSimdEnabled => LanguageCs;
     public bool MethodGpuEnabled => LanguageCpp;
 
+    private bool _fullScreen = false;
+    public bool FullScreen
+    {
+      get
+      {
+        return _fullScreen;
+      }
+      set
+      {
+        _fullScreen = value;
+        Action fireProperties = () =>
+        {
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FullScreen)));
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ToolsVisibility)));
+          // Important to set Style before State
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WindowStyle)));
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WindowsState)));
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResizeMode)));
+        };
+
+        fireProperties();
+        if (_fullScreen && _lastWindowState == WindowState.Maximized)
+        {
+          // WindowState needs to be set to Maximized after setting WindowStyle, and not before, so we need to toggle it
+          _fullScreen = false;
+          fireProperties();
+          Task.Run(() =>
+          {
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            {
+              _fullScreen = true;
+              fireProperties();
+            }));
+          });
+        }
+
+      }
+    }
+    public Visibility ToolsVisibility => FullScreen ? Visibility.Collapsed : Visibility.Visible;
+
+    private WindowState _lastWindowState;
+    public WindowState WindowsState
+    {
+      get => FullScreen ? WindowState.Maximized : WindowState.Normal;
+      set => _lastWindowState = value;
+    }
+    public WindowStyle WindowStyle => FullScreen ? WindowStyle.None : WindowStyle.SingleBorderWindow;
+    public ResizeMode ResizeMode => FullScreen ? ResizeMode.NoResize : ResizeMode.CanResize;
+
+    public WindowStartupLocation WindowStartupLocation => FullScreen ? WindowStartupLocation.CenterScreen : WindowStartupLocation.Manual;
   }
 }
