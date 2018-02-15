@@ -16,5 +16,6 @@ The screen visual is generated using the C# WPF (Windows Presentation Framework)
 Here's a screenshot showing how the GPU can render the set in 27ms when zoomed in to a level where the whole set would be the bigger than the orbit of Uranus:
 
 ![Screenshot](Documentation/ScreenShot.png)
-
-<img style="float: left;" src="Documentation/ScreenShot.png">
+<p align="center">
+<img src="Documentation/ScreenShot.png">
+</p>
