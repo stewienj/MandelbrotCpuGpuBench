@@ -13,7 +13,7 @@ Zooming is done with the mouse wheel, and full screen can be toggled in a contex
 
 The screen visual is generated using the C# WPF (Windows Presentation Framework) and a custom ImageSource.
 
-Here's a screenshot showing how the GPU can render the set in 27ms when zoomed in to a level where the whole set would be the bigger than the orbit of Uranus:
+Here's a screenshot showing how the GPU can render the set in 40ms when zoomed in to a level where the whole set would be the bigger than the orbit of Uranus:
 
 <p align="center">
 <img src="Documentation/ScreenShot.png">
