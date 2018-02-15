@@ -11,7 +11,8 @@
         ResizeMode="{Binding ResizeMode}"
         PreviewKeyDown="Window_PreviewKeyDown"
         PreviewMouseDoubleClick="ToggleFullScreen_Click"
-        Title="{Binding Title}" Height="350" Width="525">
+        Title="{Binding Title}" Height="350" Width="525"
+        Icon="/MandelbrotCpuGpuBench;component/MandelbrotIcon.png">
   <Window.Resources>
     <Style TargetType="RadioButton">
       <Setter Property="Margin" Value="1,0"/>
