@@ -55,8 +55,9 @@
 
       <!-- Precision -->
       <Border>
-        <UniformGrid Rows="2">
+        <UniformGrid Rows="2" Columns="2" >
           <RadioButton IsChecked="{Binding PrecisionFloat}">Float</RadioButton>
+          <RadioButton IsChecked="{Binding PrecisionDecimal}" IsEnabled="{Binding MethodDecimalEnabled}">Decimal</RadioButton>
           <RadioButton IsChecked="{Binding PrecisionDouble}">Double</RadioButton>
         </UniformGrid>
       </Border>

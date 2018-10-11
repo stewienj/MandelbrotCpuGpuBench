@@ -15,9 +15,9 @@ namespace MandelbrotCpuGpuBench
 {
   public class Workspace: INotifyPropertyChanged
   {
-    private double _zoomLevel = 0.001;
-    private double _viewR = 0.001643721971153;
-    private double _viewI = 0.822467633298876;
+    private decimal _zoomLevel = 0.001M;
+    private decimal _viewR = 0.001643721971153M;
+    private decimal _viewI = 0.822467633298876M;
     private int _bufferWidth = 0;
     private int _bufferHeight = 0;
     private Stopwatch _stopwatch = new Stopwatch();
@@ -65,30 +65,30 @@ namespace MandelbrotCpuGpuBench
 
     public void Move(Vector distance)
     {
-      _viewR += distance.X * _zoomLevel;
-      _viewI += distance.Y * _zoomLevel;
+      _viewR += (decimal)distance.X * _zoomLevel;
+      _viewI += (decimal)distance.Y * _zoomLevel;
       OnParametersChanged();
     }
 
     public void Zoom(int zDelta, Point location)
     {
-      var oldDistance = (location - new Point(_bufferWidth / 2.0, _bufferHeight / 2.0)) * _zoomLevel;
-      double factor = 1.2;
-      double offset = 0;
+      var oldDistance = (location - new Point(_bufferWidth / 2.0, _bufferHeight / 2.0)) * (double)_zoomLevel;
+      decimal factor = 1.2M;
+      decimal offset = 0;
       if (zDelta > 0)
       {
         _zoomLevel /= factor;
-        offset = (1.0 - 1.0 / factor);
+        offset = (1.0M - 1.0M / factor);
       }
       else
       {
-        _zoomLevel *= factor;
-        offset = 1.0 - factor;
+        _zoomLevel *= (decimal)factor;
+        offset = 1.0M - factor;
       }
 
       // Correct for the position of the mouse
-      _viewR += oldDistance.X * offset;
-      _viewI += oldDistance.Y * offset;
+      _viewR += (decimal)oldDistance.X * offset;
+      _viewI += (decimal)oldDistance.Y * offset;
 
       OnParametersChanged();
     }
@@ -128,7 +128,7 @@ namespace MandelbrotCpuGpuBench
         _spareBuffers.Clear();
       }
 
-      int maxiter = (int)(-512 * Math.Log10(_zoomLevel));
+      int maxiter = (int)(-512 * Math.Log10((double)_zoomLevel));
       Func<int, (byte R, byte G, byte B)> itersToColor = FractalRenderer.GetColorProviderV2(maxiter + 1);
       Action<int, int, int> addPixel = (x, y, iters) =>
       {
@@ -141,19 +141,35 @@ namespace MandelbrotCpuGpuBench
 
       int halfHeight = (int)(Math.Floor(height / 2.0));
       int halfWidth = (int)(Math.Floor(width / 2.0));
-      double xMin = -halfWidth * _zoomLevel + _viewR;
-      double xMax = halfWidth * _zoomLevel + _viewR;
-      double yMin = -halfHeight * _zoomLevel + _viewI;
-      double yMax = halfHeight * _zoomLevel + _viewI;
-      double step = _zoomLevel;
+      decimal xMin = -halfWidth * _zoomLevel + _viewR;
+      decimal xMax = halfWidth * _zoomLevel + _viewR;
+      decimal yMin = -halfHeight * _zoomLevel + _viewI;
+      decimal yMax = halfHeight * _zoomLevel + _viewI;
+      decimal step = _zoomLevel;
 
-      var render = FractalRenderer.SelectRender(addPixel, () => false, MethodCpuSimd, PrecisionDouble, ThreadModelMulti, false);
-
-      Action DoRender = null;
+      Func<bool> DoRender = null;
+      Action AbortRender = null;
 
       if (LanguageCs)
       {
-        DoRender = () => render(xMin, xMax, yMin, yMax, step, maxiter);
+        if (!PrecisionDecimal)
+        {
+          (var render, var abort) = FractalRenderer.SelectRender(addPixel, () => false, MethodCpuSimd, PrecisionDouble, ThreadModelMulti);
+          DoRender = () => render((double)xMin, (double)xMax, (double)yMin, (double)yMax, (double)step, maxiter);
+          AbortRender = () => abort();
+        }
+        else
+        {
+          var renderer = new ScalarDecimalRenderer(addPixel, () => false);
+          if (ThreadModelMulti)
+          {
+            DoRender = () => renderer.RenderMultiThreaded(xMin, xMax, yMin, yMax, step, maxiter);
+          }
+          else
+          {
+            DoRender = () => renderer.RenderSingleThreaded(xMin, xMax, yMin, yMax, step, maxiter);
+          }
+        }
       }
       else if (_languageCpp)
       {
@@ -161,8 +177,9 @@ namespace MandelbrotCpuGpuBench
         {
           fixed (int* fixedBuffer = buffer)
           {
-            RenderMandelbrotCpp(MethodGpu, PrecisionDouble, ThreadModelMulti, _zoomLevel, _viewR, _viewI, fixedBuffer, width, height);
+            RenderMandelbrotCpp(MethodGpu, PrecisionDouble, ThreadModelMulti, (double)_zoomLevel, (double)_viewR, (double)_viewI, fixedBuffer, width, height);
           }
+          return true;
         };
       }
 
@@ -171,15 +188,16 @@ namespace MandelbrotCpuGpuBench
       {
         _stopwatch.Reset();
         _stopwatch.Start();
-        DoRender();
+        bool success = DoRender();
         _stopwatch.Stop();
 
-        double fullSetPixels = 4 / _zoomLevel;
+        if (!success)
+          return;
+
+        double fullSetPixels = 4 / (double) _zoomLevel;
         double meters = _funDistances.PixelsToMeters(fullSetPixels);
 
-        Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Whole Set Size = {Math.Round(meters)} meters (> {_funDistances.PixelsToFunDistance(fullSetPixels)})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / _zoomLevel, 1)}";
-
-
+        Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Whole Set Size = {Math.Round(meters)} meters (> {_funDistances.PixelsToFunDistance(fullSetPixels)})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / (double)_zoomLevel, 1)}";
 
         var temp = (MandelbrotImage as ArrayBitmapSource)?.Buffer;
         var image = new ArrayBitmapSource(buffer);
@@ -240,6 +258,7 @@ namespace MandelbrotCpuGpuBench
         }
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodCpuSimd)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodCpuSimdEnabled)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodDecimalEnabled)));
       }
     }
     private bool _languageCpp = false;
@@ -253,7 +272,13 @@ namespace MandelbrotCpuGpuBench
         {
           MethodGpu = true;
         }
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodGpu)));
+        if (_languageCpp && PrecisionDecimal)
+        {
+          PrecisionDecimal = false;
+          PrecisionDouble = true;
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PrecisionDecimal)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PrecisionDouble)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodGpuEnabled)));
       }
     }
@@ -261,11 +286,13 @@ namespace MandelbrotCpuGpuBench
     public bool ThreadModelSingle { get; set; } = false;
     public bool PrecisionFloat { get; set; } = true;
     public bool PrecisionDouble { get; set; } = false;
+    public bool PrecisionDecimal { get; set; } = false;
     public bool MethodCpuSimd { get; set; } = true;
     public bool MethodCpuFpu { get; set; } = false;
     public bool MethodGpu { get; set; } = false;
     public bool MethodCpuSimdEnabled => LanguageCs;
     public bool MethodGpuEnabled => LanguageCpp;
+    public bool MethodDecimalEnabled => LanguageCs;
 
     private bool _fullScreen = false;
     public bool FullScreen

@@ -4,12 +4,10 @@ namespace Algorithms
 {
   public abstract class FractalRenderer
   {
-    public delegate void Render(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations);
+    public delegate bool Render(double xmin, double xmax, double ymin, double ymax, double step, double maxIterations);
 
     private Func<bool> abort;
     private Action<int, int, int> drawPixel;
-    //public int maxIterations = 1000; // Make this higher to see more detail when zoomed in (and slow down rendering a lot)
-     
 
     protected FractalRenderer(Action<int, int, int> draw, Func<bool> checkAbort)
     {
@@ -18,129 +16,77 @@ namespace Algorithms
 
     protected Action<int, int, int> DrawPixel { get { return drawPixel; } }
 
+    public void DoAbort()
+    {
+      abort = () => true;
+    }
+
     public bool Abort { get { return abort(); } }
 
-    public static Render SelectRender(Action<int, int, int> draw, Func<bool> abort, bool useVectorTypes, bool doublePrecision, bool isMultiThreaded, bool useAbstractDataType, bool dontUseIntTypes = true)
+    public static (Render, Action) SelectRender(Action<int, int, int> draw, Func<bool> abort, bool useVectorTypes, bool doublePrecision, bool isMultiThreaded)
     {
       if (useVectorTypes && doublePrecision)
       {
-        if (dontUseIntTypes)
+        var r = new VectorDoubleRenderer(draw, abort);
+        Render render;
+        if (isMultiThreaded)
         {
-          var r = new VectorDoubleStrictRenderer(draw, abort);
-          if (isMultiThreaded)
-          {
-            if (useAbstractDataType)
-              return r.RenderMultiThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderMultiThreadedNoADT;
-          }
-          else // !isMultiThreaded
-          {
-            if (useAbstractDataType)
-              return r.RenderSingleThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderSingleThreadedNoADT;
-          }
+          render = r.RenderMultiThreaded;
         }
-        else // !dontUseIntTypes
+        else // !isMultiThreaded
         {
-          var r = new VectorDoubleRenderer(draw, abort);
-          if (isMultiThreaded)
-          {
-            if (useAbstractDataType)
-              return r.RenderMultiThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderMultiThreadedNoADT;
-          }
-          else // !isMultiThreaded
-          {
-            if (useAbstractDataType)
-              return r.RenderSingleThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderSingleThreadedNoADT;
-          }
+          render = r.RenderSingleThreaded;
         }
+        return (render, () => r.DoAbort());
+
       }
       else if (useVectorTypes && !doublePrecision)
       {
-        if (dontUseIntTypes)
+        var r = new VectorFloatRenderer(draw, abort);
+        Render render;
+        if (isMultiThreaded)
         {
-          var r = new VectorFloatStrictRenderer(draw, abort);
-          if (isMultiThreaded)
-          {
-            if (useAbstractDataType)
-              return r.RenderMultiThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderMultiThreadedNoADT;
-          }
-          else // !isMultiThreaded
-          {
-            if (useAbstractDataType)
-              return r.RenderSingleThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderSingleThreadedNoADT;
-          }
+          render = r.RenderMultiThreaded;
         }
-        else // !dontUseIntTypes
+        else // !isMultiThreaded
         {
-          var r = new VectorFloatRenderer(draw, abort);
-          if (isMultiThreaded)
-          {
-            if (useAbstractDataType)
-              return r.RenderMultiThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderMultiThreadedNoADT;
-          }
-          else // !isMultiThreaded
-          {
-            if (useAbstractDataType)
-              return r.RenderSingleThreadedWithADT;
-            else // !useAbstractDataType
-              return r.RenderSingleThreadedNoADT;
-          }
+          render = r.RenderSingleThreaded;
         }
+        return (render, () => r.DoAbort());
       }
       else if (!useVectorTypes && doublePrecision)
       {
         var r = new ScalarDoubleRenderer(draw, abort);
+        Render render;
         if (isMultiThreaded)
         {
-          if (useAbstractDataType)
-            return r.RenderMultiThreadedWithADT;
-          else // !useAbstractDataType
-            return r.RenderMultiThreadedNoADT;
+          render = r.RenderMultiThreaded;
         }
         else // !isMultiThreaded
         {
-          if (useAbstractDataType)
-            return r.RenderSingleThreadedWithADT;
-          else // !useAbstractDataType
-            return r.RenderSingleThreadedNoADT;
+          render = r.RenderSingleThreaded;
         }
+        return (render, () => r.DoAbort());
       }
       else // (!useVectorTypes && !doublePrecision)
       {
         var r = new ScalarFloatRenderer(draw, abort);
+        Render render;
         if (isMultiThreaded)
         {
-          if (useAbstractDataType)
-            return r.RenderMultiThreadedWithADT;
-          else // !useAbstractDataType
-            return r.RenderMultiThreadedNoADT;
+          render = r.RenderMultiThreaded;
         }
         else // !isMultiThreaded
         {
-          if (useAbstractDataType)
-            return r.RenderSingleThreadedWithADT;
-          else // !useAbstractDataType
-            return r.RenderSingleThreadedNoADT;
+          render = r.RenderSingleThreaded;
         }
+        return (render, () => r.DoAbort());
       }
     }
 
     public static Func<int, (byte R, byte G, byte B)> GetColorProviderOriginal()
     {
-      var table = new(byte, byte, byte)[1001];
+      var table = new (byte, byte, byte)[1001];
       for (int iters = 0; iters <= 1000; ++iters)
       {
         int val = 1000 - Math.Min(iters, 1000);
@@ -162,11 +108,11 @@ namespace Algorithms
     {
       return (iters) =>
       {
-        if (iters==escapedValue)
+        if (iters == escapedValue)
         {
           return (0, 0, 0);
         }
-        var iter = (iters*5) % 1280;
+        var iter = (iters * 5) % 1280;
         int r = iter & 255;
         int g = 0;
         int b = 0;

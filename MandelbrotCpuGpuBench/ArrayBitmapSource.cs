@@ -41,6 +41,11 @@ namespace MandelbrotCpuGpuBench
 
     public override BitmapPalette Palette => null;
 
+    public void OnDecodeFailed()
+    {
+      DecodeFailed?.Invoke(this, null);
+    }
+
     public override event EventHandler<ExceptionEventArgs> DecodeFailed;
 
     public override void CopyPixels(Int32Rect sourceRect, Array pixels, int stride, int offset)

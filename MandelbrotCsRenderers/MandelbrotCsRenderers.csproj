@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{90648122-BCC7-478C-998B-65E91D6DC7C3}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MandelbrotCsRenderers</RootNamespace>
     <AssemblyName>MandelbrotCsRenderers</AssemblyName>
@@ -16,6 +16,9 @@
     <WarningLevel>4</WarningLevel>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(SolutionDir)\PropertySheets\CsOutputDirectories.props" Condition="exists('$(SolutionDir)\PropertySheets\CsOutputDirectories.props')" />
@@ -43,39 +46,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Abstractions.cs" />
-    <Compile Include="FlyThru.xaml.cs">
-      <DependentUpon>FlyThru.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Interfaces.cs" />
+    <Compile Include="ScalarDecimal.cs" />
     <Compile Include="ScalarDouble.cs" />
     <Compile Include="ScalarFloat.cs" />
     <Compile Include="VectorDouble.cs" />
-    <Compile Include="VectorDoubleStrict.cs" />
     <Compile Include="VectorFloat.cs" />
-    <Compile Include="VectorFloatStrict.cs" />
     <Compile Include="VectorHelpers.cs" />
     <Compile Include="WPFHelpers.cs" />
-    <Page Include="FlyThru.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -84,7 +62,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
