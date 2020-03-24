@@ -5,3 +5,5 @@ Bin/
 Intermediate/
 Lib/
 *.user
+MandelbrotCpuGpuBench/obj/
+MandelbrotCsRenderers/obj/
