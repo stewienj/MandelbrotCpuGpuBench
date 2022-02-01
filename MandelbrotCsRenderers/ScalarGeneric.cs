@@ -1,37 +1,45 @@
 ﻿using System;
+using System.Numerics;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
+
+// Set this https://dunnhq.com/posts/2021/generic-math/
 
 namespace Algorithms
 {
     // This class contains renderers that use scalar doubles
-    internal class ScalarDoubleRenderer : FractalRenderer
+    [RequiresPreviewFeatures]
+    public class ScalarGeneric<T> : FractalRenderer where T : INumber<T>
     {
-        public ScalarDoubleRenderer(Action<int, int, int> dp, Func<bool> abortFunc)
+        public ScalarGeneric(Action<int, int, int> dp, Func<bool> abortFunc)
             : base(dp, abortFunc)
         {
         }
+        protected static T Two = T.One + T.One;
+        protected static T Four = Two + Two;
+        protected static T Half = Two / Four;
+        protected T limit = Four;
 
-        protected const double limit = 4.0;
 
         // Render the fractal with no data type abstraction on a single thread with scalar doubles
-        public bool RenderSingleThreaded(double xmin, double xmax, double ymin, double ymax, double step, int maxIterations)
+        public bool RenderSingleThreaded(T xmin, T xmax, T ymin, T ymax, T step, Int64 maxIterations)
         {
             int yp = 0;
-            for (double y = ymin; y < ymax && !Abort; y += step, yp++)
+            for (T y = ymin; y < ymax && !Abort; y += step, yp++)
             {
                 if (Abort)
                     return false;
                 int xp = 0;
-                for (double x = xmin; x < xmax; x += step, xp++)
+                for (T x = xmin; x < xmax; x += step, xp++)
                 {
-                    double accumx = x;
-                    double accumy = y;
+                    T accumx = x;
+                    T accumy = y;
                     int iters = 0;
-                    double sqabs = 0.0;
+                    T sqabs = T.Zero;
                     do
                     {
-                        double naccumx = accumx * accumx - accumy * accumy;
-                        double naccumy = 2.0 * accumx * accumy;
+                        T naccumx = accumx * accumx - accumy * accumy;
+                        T naccumy = Two * accumx * accumy;
                         accumx = naccumx + x;
                         accumy = naccumy + y;
                         iters++;
@@ -45,24 +53,28 @@ namespace Algorithms
         }
 
         // Render the fractal with no data type abstraction on multiple threads with scalar doubles
-        public bool RenderMultiThreaded(double xmin, double xmax, double ymin, double ymax, double step, int maxIterations)
+        public bool RenderMultiThreaded(T xmin, T xmax, T ymin, T ymax, T step, Int64 maxIterations)
         {
-            Parallel.For(0, (int)(((ymax - ymin) / step) + .5), (yp) =>
+            Parallel.For(0, int.Parse((((ymax - ymin) / step) + Half).ToString()), (yp) =>
             {
                 if (Abort)
                     return;
-                double y = ymin + step * yp;
-                int xp = 0;
-                for (double x = xmin; x < xmax; x += step, xp++)
+                T y = ymin;
+                for (int i = 0; i < yp; ++i)
                 {
-                    double accumx = x;
-                    double accumy = y;
+                    y += step;
+                }
+                int xp = 0;
+                for (T x = xmin; x < xmax; x += step, xp++)
+                {
+                    T accumx = x;
+                    T accumy = y;
                     int iters = 0;
-                    double sqabs = 0.0;
+                    T sqabs = T.Zero;
                     do
                     {
-                        double naccumx = accumx * accumx - accumy * accumy;
-                        double naccumy = 2.0 * accumx * accumy;
+                        T naccumx = accumx * accumx - accumy * accumy;
+                        T naccumy = Two * accumx * accumy;
                         accumx = naccumx + x;
                         accumy = naccumy + y;
                         iters++;
