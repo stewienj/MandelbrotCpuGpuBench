@@ -37,39 +37,7 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" Visibility="{Binding ToolsVisibility}">
 
-            <!-- Language -->
-            <Border>
-                <UniformGrid Rows="2">
-                    <RadioButton IsChecked="{Binding LanguageCs}">C#</RadioButton>
-                    <RadioButton IsChecked="{Binding LanguageCpp}">C++</RadioButton>
-                </UniformGrid>
-            </Border>
-
-            <!-- Thread Model -->
-            <Border>
-                <UniformGrid Rows="2">
-                    <RadioButton IsChecked="{Binding ThreadModelMulti}">Multi Threaded</RadioButton>
-                    <RadioButton IsChecked="{Binding ThreadModelSingle}">Single Threaded</RadioButton>
-                </UniformGrid>
-            </Border>
-
-            <!-- Precision -->
-            <Border>
-                <UniformGrid Rows="2" Columns="2" >
-                    <RadioButton IsChecked="{Binding PrecisionFloat}">Float</RadioButton>
-                    <RadioButton IsChecked="{Binding PrecisionDouble128}" IsEnabled="{Binding MethodDouble128Enabled}">Double128</RadioButton>
-                    <RadioButton IsChecked="{Binding PrecisionDouble}">Double</RadioButton>
-                </UniformGrid>
-            </Border>
-
-            <!-- Method -->
-            <Border>
-                <UniformGrid Rows="2" Columns="2">
-                    <RadioButton IsChecked="{Binding MethodCpuSimd}" IsEnabled="{Binding MethodCpuSimdEnabled}">CPU SIMD</RadioButton>
-                    <RadioButton IsChecked="{Binding MethodCpuFpu}">CPU FPU</RadioButton>
-                    <RadioButton  IsChecked="{Binding MethodGpu}" IsEnabled="{Binding MethodGpuEnabled}">GPU</RadioButton>
-                </UniformGrid>
-            </Border>
+            <local:OptionsPanel DataContext="{Binding Options}"/>
 
             <Button Click="Render_Click">Render Current View</Button>
             <Button Click="ToggleFullScreen_Click">Toggle Full Screen</Button>

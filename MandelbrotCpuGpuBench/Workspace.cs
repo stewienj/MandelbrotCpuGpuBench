@@ -27,6 +27,12 @@ namespace MandelbrotCpuGpuBench
         [DllImport("MandelbrotCppRenderers.dll")]
         static extern unsafe void RenderMandelbrotCpp(bool useGpu, bool doublePrecision, bool multiThreaded, double zoomLevel, double r, double i, int* pBuffer, int bufferWidth, int bufferHeight);
 
+        public Workspace()
+        {
+            Options.Cpp.MethodCpuFpu = true;
+            Options.Cpp.MethodCpuSimd = false;
+        }
+
         /// <summary>
         /// Test memory layout, have come to the conclusion that a 2D array is to be used as
         /// shown in this Test.
@@ -147,18 +153,19 @@ namespace MandelbrotCpuGpuBench
             Func<bool> DoRender = null;
             Action AbortRender = null;
 
-            if (LanguageCs)
+            if (Options.LanguageCs)
             {
-                if (!PrecisionDouble128)
+                var cs = Options.Cs;
+                if (!cs.PrecisionFloat128)
                 {
-                    (var render, var abort) = FractalRenderer.SelectRender(addPixel, () => false, MethodCpuSimd, PrecisionDouble, ThreadModelMulti);
+                    (var render, var abort) = FractalRenderer.SelectRender(addPixel, () => false, cs.MethodCpuSimd, cs.PrecisionFloat64, cs.ThreadModelMulti);
                     DoRender = () => render((double)xMin, (double)xMax, (double)yMin, (double)yMax, (double)step, maxiter);
                     AbortRender = () => abort();
                 }
                 else
                 {
                     var renderer = new ScalarDoubleDoubleRenderer(addPixel, () => false);
-                    if (ThreadModelMulti)
+                    if (cs.ThreadModelMulti)
                     {
                         DoRender = () => renderer.RenderMultiThreaded(xMin, xMax, yMin, yMax, step, maxiter);
                     }
@@ -168,13 +175,14 @@ namespace MandelbrotCpuGpuBench
                     }
                 }
             }
-            else if (_languageCpp)
+            else if (Options.LanguageCpp)
             {
+                var cpp = Options.Cpp;
                 DoRender = () =>
                 {
                     fixed (int* fixedBuffer = buffer)
                     {
-                        RenderMandelbrotCpp(MethodGpu, PrecisionDouble, ThreadModelMulti, (double)_zoomLevel, (double)_viewR, (double)_viewI, fixedBuffer, width, height);
+                        RenderMandelbrotCpp(cpp.MethodGpu, cpp.PrecisionFloat64, cpp.ThreadModelMulti, (double)_zoomLevel, (double)_viewR, (double)_viewI, fixedBuffer, width, height);
                     }
                     return true;
                 };
@@ -242,54 +250,7 @@ namespace MandelbrotCpuGpuBench
             }
         }
 
-        private bool _languageCs = true;
-        public bool LanguageCs
-        {
-            get => _languageCs;
-            set
-            {
-                _languageCs = value;
-                if (_languageCs && MethodGpu)
-                {
-                    MethodCpuSimd = true;
-                }
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodCpuSimd)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodCpuSimdEnabled)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodDouble128Enabled)));
-            }
-        }
-        private bool _languageCpp = false;
-        public bool LanguageCpp
-        {
-            get => _languageCpp;
-            set
-            {
-                _languageCpp = value;
-                if (_languageCpp && MethodCpuSimd)
-                {
-                    MethodGpu = true;
-                }
-                if (_languageCpp && PrecisionDouble128)
-                {
-                    PrecisionDouble128 = false;
-                    PrecisionDouble = true;
-                }
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PrecisionDouble128)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PrecisionDouble)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MethodGpuEnabled)));
-            }
-        }
-        public bool ThreadModelMulti { get; set; } = true;
-        public bool ThreadModelSingle { get; set; } = false;
-        public bool PrecisionFloat { get; set; } = true;
-        public bool PrecisionDouble { get; set; } = false;
-        public bool PrecisionDouble128 { get; set; } = false;
-        public bool MethodCpuSimd { get; set; } = true;
-        public bool MethodCpuFpu { get; set; } = false;
-        public bool MethodGpu { get; set; } = false;
-        public bool MethodCpuSimdEnabled => LanguageCs;
-        public bool MethodGpuEnabled => LanguageCpp;
-        public bool MethodDouble128Enabled => LanguageCs;
+        public RendererOptionsViewModel Options { get; } = new RendererOptionsViewModel();
 
         private bool _fullScreen = false;
         public bool FullScreen
