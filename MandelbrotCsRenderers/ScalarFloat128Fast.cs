@@ -2,12 +2,12 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Algorithms
+namespace MandelbrotCsRenderers
 {
     // This class contains renderers that use scalar doubles
-    public class ScalarDoubleDoubleRenderer : FractalRenderer
+    public class ScalarFloat128FastRenderer : FractalRenderer128
     {
-        public ScalarDoubleDoubleRenderer(Action<int, int, int> dp, Func<bool> abortFunc)
+        public ScalarFloat128FastRenderer(Action<int, int, int> dp, Func<bool> abortFunc)
             : base(dp, abortFunc)
         {
         }
@@ -17,7 +17,7 @@ namespace Algorithms
 
 
         // Render the fractal with no data type abstraction on a single thread with scalar doubles
-        public bool RenderSingleThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
+        public override bool RenderSingleThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
         {
             return RenderSingleThreadedInternal(
                 new DoubleDouble((double)xmin),
@@ -31,12 +31,12 @@ namespace Algorithms
         public bool RenderSingleThreadedInternal(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
         {
             int yp = 0;
-            for (DoubleDouble y = ymin; y.Sub(ymax).Hi < 0 && !Abort; y = y.Add(step), yp++)
+            for (DoubleDouble y = ymin; y.SubFast(ymax).Hi < 0 && !Abort; y = y.AddFast(step), yp++)
             {
                 if (Abort)
                     return false;
                 int xp = 0;
-                for (DoubleDouble x = xmin; x.Sub(xmax).Hi < 0; x = x.Add(step), xp++)
+                for (DoubleDouble x = xmin; x.SubFast(xmax).Hi < 0; x = x.AddFast(step), xp++)
                 {
                     DoubleDouble accumx = x;
                     DoubleDouble accumy = y;
@@ -44,13 +44,13 @@ namespace Algorithms
                     DoubleDouble sqabs = new DoubleDouble(0);
                     do
                     {
-                        DoubleDouble naccumx = accumx.Sqr().Sub(accumy.Sqr());
+                        DoubleDouble naccumx = accumx.Sqr().SubFast(accumy.Sqr());
                         DoubleDouble naccumy = TWO.Mul(accumx).Mul(accumy);
-                        accumx = naccumx.Add(x);
-                        accumy = naccumy.Add(y);
+                        accumx = naccumx.AddFast(x);
+                        accumy = naccumy.AddFast(y);
                         iters++;
-                        sqabs = accumx.Sqr().Add(accumy.Sqr());
-                    } while (sqabs.Sub(limit).Hi < 0 && iters < maxIterations);
+                        sqabs = accumx.Sqr().AddFast(accumy.Sqr());
+                    } while (sqabs.SubFast(limit).Hi < 0 && iters < maxIterations);
 
                     DrawPixel(xp, yp, iters);
                 }
@@ -59,7 +59,7 @@ namespace Algorithms
         }
 
         // Render the fractal with no data type abstraction on multiple threads with scalar doubles
-        public bool RenderMultiThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
+        public override bool RenderMultiThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
         {
             return RenderMultiThreadedInternal(
                 new DoubleDouble((double)xmin),
@@ -76,13 +76,13 @@ namespace Algorithms
             DoubleDouble HALF = new DoubleDouble(0.5);
 
             //Parallel.For(0, (int)(((ymax - ymin) / step) + .5M), (yp) =>
-            Parallel.For(0, ymax.Sub(ymin).Div(step).Add(HALF).IntValue(), (yp) =>
+            Parallel.For(0, ymax.SubFast(ymin).Div(step).AddFast(HALF).IntValue(), (yp) =>
             {
                 if (Abort)
                     return;
-                DoubleDouble y = ymin.Add(step.Mul(yp));
+                DoubleDouble y = ymin.AddFast(step.Mul(yp));
                 int xp = 0;
-                for (DoubleDouble x = xmin; x.Sub(xmax).Hi < 0; x = x.Add(step), xp++)
+                for (DoubleDouble x = xmin; x.SubFast(xmax).Hi < 0; x = x.AddFast(step), xp++)
                 {
                     DoubleDouble accumx = x;
                     DoubleDouble accumy = y;
@@ -90,13 +90,13 @@ namespace Algorithms
                     DoubleDouble sqabs = new DoubleDouble(0);
                     do
                     {
-                        DoubleDouble naccumx = accumx.Sqr().Sub(accumy.Sqr());
+                        DoubleDouble naccumx = accumx.Sqr().SubFast(accumy.Sqr());
                         DoubleDouble naccumy = TWO.Mul(accumx).Mul(accumy);
-                        accumx = naccumx.Add(x);
-                        accumy = naccumy.Add(y);
+                        accumx = naccumx.AddFast(x);
+                        accumy = naccumy.AddFast(y);
                         iters++;
-                        sqabs = accumx.Sqr().Add(accumy.Sqr());
-                    } while (sqabs.Sub(limit).Hi < 0 && iters < maxIterations);
+                        sqabs = accumx.Sqr().AddFast(accumy.Sqr());
+                    } while (sqabs.SubFast(limit).Hi < 0 && iters < maxIterations);
 
                     DrawPixel(xp, yp, iters);
                 }

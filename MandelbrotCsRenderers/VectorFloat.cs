@@ -2,13 +2,13 @@
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace Algorithms
+namespace MandelbrotCsRenderers
 {
     // This contains renderers that only use Vector<float>'s with no Vector<int> types. It's
     // primarily useful when targeting AVX (not AVX2), because AVX doesn't support 256 bits of
     // integer values, only floating point values, so using Vector<int> results in less than
     // optimal code gen. For a well commented implementation, see VectorFloat.cs
-    internal class VectorFloatRenderer : FractalRenderer
+    internal class VectorFloatRenderer : FractalRenderer64
     {
         private const float limit = 4.0f;
 
@@ -19,7 +19,7 @@ namespace Algorithms
 
         // Render the fractal on multiple threads using raw Vector<float> data types
         // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-        public bool RenderMultiThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
+        public override bool RenderMultiThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
         {
             float xmin = (float)xmind;
             float xmax = (float)xmaxd;
@@ -69,7 +69,7 @@ namespace Algorithms
 
         // Render the fractal on a single thread using raw Vector<float> data types
         // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-        public bool RenderSingleThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
+        public override bool RenderSingleThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
         {
             float xmin = (float)xmind;
             float xmax = (float)xmaxd;

@@ -1,4 +1,4 @@
-﻿using Algorithms;
+﻿using MandelbrotCsRenderers;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -75,7 +75,7 @@ namespace MandelbrotCpuGpuBench
 
         public void Zoom(int zDelta, Point location)
         {
-            var oldDistance = (location - new Point(_bufferWidth / 2.0, _bufferHeight / 2.0)) * (double)_zoomLevel;
+            (decimal X, decimal Y) oldDistance = ((decimal)(location.X - _bufferWidth / 2.0) * _zoomLevel, (decimal)(location.Y - _bufferHeight / 2.0)*_zoomLevel);
             decimal factor = 1.2M;
             decimal offset = 0;
             if (zDelta > 0)
@@ -85,7 +85,7 @@ namespace MandelbrotCpuGpuBench
             }
             else
             {
-                _zoomLevel *= (decimal)factor;
+                _zoomLevel *= factor;
                 offset = 1.0M - factor;
             }
 
@@ -132,7 +132,7 @@ namespace MandelbrotCpuGpuBench
             }
 
             int maxiter = (int)(-512 * Math.Log10((double)_zoomLevel));
-            Func<int, (byte R, byte G, byte B)> itersToColor = FractalRenderer.GetColorProviderV2(maxiter + 1);
+            Func<int, (byte R, byte G, byte B)> itersToColor = FractalRendererBase.GetColorProviderV2(maxiter + 1);
             Action<int, int, int> addPixel = (x, y, iters) =>
             {
                 if (y >= height || x >= width)
@@ -156,23 +156,17 @@ namespace MandelbrotCpuGpuBench
             if (Options.LanguageCs)
             {
                 var cs = Options.Cs;
-                if (!cs.PrecisionFloat128)
+                if (!cs.PrecisionFloat128 && !cs.PrecisionFloat128Fast)
                 {
-                    (var render, var abort) = FractalRenderer.SelectRender(addPixel, () => false, cs.MethodCpuSimd, cs.PrecisionFloat64, cs.ThreadModelMulti);
+                    (var render, var abort) = FractalRenderer64.SelectRender(addPixel, () => false, cs.MethodCpuSimd, cs.PrecisionFloat64, cs.ThreadModelMulti);
                     DoRender = () => render((double)xMin, (double)xMax, (double)yMin, (double)yMax, (double)step, maxiter);
                     AbortRender = () => abort();
                 }
                 else
                 {
-                    var renderer = new ScalarDoubleDoubleRenderer(addPixel, () => false);
-                    if (cs.ThreadModelMulti)
-                    {
-                        DoRender = () => renderer.RenderMultiThreaded(xMin, xMax, yMin, yMax, step, maxiter);
-                    }
-                    else
-                    {
-                        DoRender = () => renderer.RenderSingleThreaded(xMin, xMax, yMin, yMax, step, maxiter);
-                    }
+                    (var render, var abort) = FractalRenderer128.SelectRender128(addPixel, () => false, cs.MethodCpuSimd, cs.ThreadModelMulti, cs.PrecisionFloat128Fast);
+                    DoRender = () => render(xMin, xMax, yMin, yMax, step, maxiter);
+                    AbortRender = () => abort();
                 }
             }
             else if (Options.LanguageCpp)

@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Algorithms
+namespace MandelbrotCsRenderers
 {
     // This class contains renderers that use scalar doubles
-    public class ScalarDecimalRenderer : FractalRenderer
+    public class ScalarDecimalRenderer : FractalRenderer128
     {
+        protected const decimal limit = 4.0M;
+
         public ScalarDecimalRenderer(Action<int, int, int> dp, Func<bool> abortFunc)
             : base(dp, abortFunc)
         {
         }
 
-        protected const decimal limit = 4.0M;
-
         // Render the fractal with no data type abstraction on a single thread with scalar doubles
-        public bool RenderSingleThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
+        public override bool RenderSingleThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
         {
             int yp = 0;
             for (decimal y = ymin; y < ymax && !Abort; y += step, yp++)
@@ -45,7 +45,7 @@ namespace Algorithms
         }
 
         // Render the fractal with no data type abstraction on multiple threads with scalar doubles
-        public bool RenderMultiThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
+        public override bool RenderMultiThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
         {
             Parallel.For(0, (int)(((ymax - ymin) / step) + .5M), (yp) =>
             {

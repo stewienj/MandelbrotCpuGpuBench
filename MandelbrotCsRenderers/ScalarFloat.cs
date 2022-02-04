@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Algorithms
+namespace MandelbrotCsRenderers
 {
     // This class contains renderers that use scalar floats
-    internal class ScalarFloatRenderer : FractalRenderer
+    internal class ScalarFloatRenderer : FractalRenderer64
     {
+        protected const float limit = 4.0f;
+
         public ScalarFloatRenderer(Action<int, int, int> dp, Func<bool> abortFunc)
             : base(dp, abortFunc)
         {
         }
 
-        protected const float limit = 4.0f;
-
         // Render the fractal with no data type abstraction on a single thread with scalar floats
-        public bool RenderSingleThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
+        public override bool RenderSingleThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
         {
 
             float xmin = (float)xmind;
@@ -51,7 +51,7 @@ namespace Algorithms
         }
 
         // Render the fractal with no data type abstraction on multiple threads with scalar floats
-        public bool RenderMultiThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
+        public override bool RenderMultiThreaded(double xmind, double xmaxd, double ymind, double ymaxd, double stepd, int maxIterations)
         {
             float xmin = (float)xmind;
             float xmax = (float)xmaxd;

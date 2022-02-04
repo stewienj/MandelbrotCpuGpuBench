@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Mandelbrot
+namespace MandelbrotCsRenderers
 {
     /// <summary>
     /// Converts true/false 0/!0 ~0.0/~<>0.0 to Visible/Collapsed

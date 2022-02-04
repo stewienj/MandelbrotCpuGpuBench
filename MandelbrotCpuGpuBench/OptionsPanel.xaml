@@ -42,6 +42,7 @@
                         <RadioButton IsChecked="{Binding PrecisionFloat32}">Float32</RadioButton>
                         <RadioButton IsChecked="{Binding PrecisionFloat128}">Float128</RadioButton>
                         <RadioButton IsChecked="{Binding PrecisionFloat64}">Float64</RadioButton>
+                        <RadioButton IsChecked="{Binding PrecisionFloat128Fast}">Float128 Fast</RadioButton>
                     </UniformGrid>
                 </Border>
 

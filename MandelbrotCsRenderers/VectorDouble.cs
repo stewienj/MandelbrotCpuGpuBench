@@ -2,13 +2,13 @@
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace Algorithms
+namespace MandelbrotCsRenderers
 {
     // This contains renderers that only use Vector<double>'s with no Vector<long> types. It's
     // primarily useful when targeting AVX (not AVX2), because AVX doesn't support 256 bits of
     // integer values, only floating point values.
     // For a well commented implementation, see VectorFloat.cs
-    internal class VectorDoubleRenderer : FractalRenderer
+    internal class VectorDoubleRenderer : FractalRenderer64
     {
         private const double limit = 4.0;
 
@@ -19,7 +19,7 @@ namespace Algorithms
 
         // Render the fractal on multiple threads using raw Vector<double> data types
         // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-        public bool RenderMultiThreaded(double xmin, double xmax, double ymin, double ymax, double step, int maxIterations)
+        public override bool RenderMultiThreaded(double xmin, double xmax, double ymin, double ymax, double step, int maxIterations)
         {
             Vector<double> vmax_iters = new Vector<double>((double)maxIterations);
             Vector<double> vlimit = new Vector<double>(limit);
@@ -63,7 +63,7 @@ namespace Algorithms
 
         // Render the fractal on a single thread using raw Vector<double> data types
         // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
-        public bool RenderSingleThreaded(double xmin, double xmax, double ymin, double ymax, double step, int maxIterations)
+        public override  bool RenderSingleThreaded(double xmin, double xmax, double ymin, double ymax, double step, int maxIterations)
         {
             Vector<double> vmax_iters = new Vector<double>((double)maxIterations);
             Vector<double> vlimit = new Vector<double>(limit);

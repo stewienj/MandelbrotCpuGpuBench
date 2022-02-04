@@ -10,7 +10,7 @@ namespace Swordfish.NET.Maths
      * @see http://crd.lbl.gov/~dhbailey/mpdist/index.html
      * @date 2006/10/22
      */
-    public class DoubleDouble
+    public struct DoubleDouble
     {
         public static char[] BASE_36_TABLE = { //
 			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', //

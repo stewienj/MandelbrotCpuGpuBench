@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace Algorithms
+namespace MandelbrotCsRenderers
 {
     public static class VectorHelper
     {
