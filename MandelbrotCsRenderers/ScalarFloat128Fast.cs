@@ -16,19 +16,7 @@ namespace MandelbrotCsRenderers
         protected DoubleDouble TWO = new DoubleDouble(2);
 
 
-        // Render the fractal with no data type abstraction on a single thread with scalar doubles
-        public override bool RenderSingleThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
-        {
-            return RenderSingleThreadedInternal(
-                new DoubleDouble((double)xmin),
-                new DoubleDouble((double)xmax),
-                new DoubleDouble((double)ymin),
-                new DoubleDouble((double)ymax),
-                new DoubleDouble((double)step),
-                maxIterations);
-        }
-
-        public bool RenderSingleThreadedInternal(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
+        public override bool RenderSingleThreaded(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
         {
             int yp = 0;
             for (DoubleDouble y = ymin; y.SubFast(ymax).Hi < 0 && !Abort; y = y.AddFast(step), yp++)
@@ -58,20 +46,7 @@ namespace MandelbrotCsRenderers
             return true;
         }
 
-        // Render the fractal with no data type abstraction on multiple threads with scalar doubles
-        public override bool RenderMultiThreaded(decimal xmin, decimal xmax, decimal ymin, decimal ymax, decimal step, int maxIterations)
-        {
-            return RenderMultiThreadedInternal(
-                new DoubleDouble((double)xmin),
-                new DoubleDouble((double)xmax),
-                new DoubleDouble((double)ymin),
-                new DoubleDouble((double)ymax),
-                new DoubleDouble((double)step),
-                maxIterations);
-        }
-
-
-        public bool RenderMultiThreadedInternal(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
+        public override bool RenderMultiThreaded(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
         {
             DoubleDouble HALF = new DoubleDouble(0.5);
 
@@ -91,7 +66,7 @@ namespace MandelbrotCsRenderers
                     do
                     {
                         DoubleDouble naccumx = accumx.Sqr().SubFast(accumy.Sqr());
-                        DoubleDouble naccumy = TWO.Mul(accumx).Mul(accumy);
+                        DoubleDouble naccumy = accumx.Mul(accumy).MulPwrOf2(2);
                         accumx = naccumx.AddFast(x);
                         accumy = naccumy.AddFast(y);
                         iters++;

@@ -1,4 +1,5 @@
 ﻿using MandelbrotCsRenderers;
+using Swordfish.NET.Maths;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -12,9 +13,9 @@ namespace MandelbrotCpuGpuBench
 {
     public class Workspace : INotifyPropertyChanged
     {
-        private decimal _zoomLevel = 0.001M;
-        private decimal _viewR = 0.001643721971153M;
-        private decimal _viewI = 0.822467633298876M;
+        private DoubleDouble _zoomLevel = new DoubleDouble(0.001);
+        private DoubleDouble _viewR = new DoubleDouble(0.001643721971153);
+        private DoubleDouble _viewI = new DoubleDouble(0.822467633298876);
         private int _bufferWidth = 0;
         private int _bufferHeight = 0;
         private Stopwatch _stopwatch = new Stopwatch();
@@ -68,30 +69,30 @@ namespace MandelbrotCpuGpuBench
 
         public void Move(Vector distance)
         {
-            _viewR += (decimal)distance.X * _zoomLevel;
-            _viewI += (decimal)distance.Y * _zoomLevel;
+            _viewR += new DoubleDouble(distance.X) * _zoomLevel;
+            _viewI += new DoubleDouble(distance.Y) * _zoomLevel;
             OnParametersChanged();
         }
 
         public void Zoom(int zDelta, Point location)
         {
-            (decimal X, decimal Y) oldDistance = ((decimal)(location.X - _bufferWidth / 2.0) * _zoomLevel, (decimal)(location.Y - _bufferHeight / 2.0)*_zoomLevel);
-            decimal factor = 1.2M;
-            decimal offset = 0;
+            (DoubleDouble X, DoubleDouble Y) oldDistance = (new DoubleDouble(location.X - _bufferWidth / 2.0) * _zoomLevel, new DoubleDouble(location.Y - _bufferHeight / 2.0)*_zoomLevel);
+            DoubleDouble factor = new DoubleDouble(1.2);
+            DoubleDouble offset = new DoubleDouble(0);
             if (zDelta > 0)
             {
                 _zoomLevel /= factor;
-                offset = (1.0M - 1.0M / factor);
+                offset = (new DoubleDouble(1.0) - new DoubleDouble(1.0) / factor);
             }
             else
             {
                 _zoomLevel *= factor;
-                offset = 1.0M - factor;
+                offset = new DoubleDouble(1.0) - factor;
             }
 
             // Correct for the position of the mouse
-            _viewR += (decimal)oldDistance.X * offset;
-            _viewI += (decimal)oldDistance.Y * offset;
+            _viewR += oldDistance.X * offset;
+            _viewI += oldDistance.Y * offset;
 
             OnParametersChanged();
         }
@@ -131,7 +132,7 @@ namespace MandelbrotCpuGpuBench
                 _spareBuffers.Clear();
             }
 
-            int maxiter = (int)(-512 * Math.Log10((double)_zoomLevel));
+            int maxiter = (int)(-512 * Math.Log10(_zoomLevel.Hi));
             Func<int, (byte R, byte G, byte B)> itersToColor = FractalRendererBase.GetColorProviderV2(maxiter + 1);
             Action<int, int, int> addPixel = (x, y, iters) =>
             {
@@ -144,11 +145,11 @@ namespace MandelbrotCpuGpuBench
 
             int halfHeight = (int)(Math.Floor(height / 2.0));
             int halfWidth = (int)(Math.Floor(width / 2.0));
-            decimal xMin = -halfWidth * _zoomLevel + _viewR;
-            decimal xMax = halfWidth * _zoomLevel + _viewR;
-            decimal yMin = -halfHeight * _zoomLevel + _viewI;
-            decimal yMax = halfHeight * _zoomLevel + _viewI;
-            decimal step = _zoomLevel;
+            DoubleDouble xMin = new DoubleDouble(-halfWidth) * _zoomLevel + _viewR;
+            DoubleDouble xMax = new DoubleDouble(halfWidth) * _zoomLevel + _viewR;
+            DoubleDouble yMin = new DoubleDouble(-halfHeight) * _zoomLevel + _viewI;
+            DoubleDouble yMax = new DoubleDouble(halfHeight) * _zoomLevel + _viewI;
+            DoubleDouble step = _zoomLevel;
 
             Func<bool> DoRender = null;
             Action AbortRender = null;
@@ -159,7 +160,7 @@ namespace MandelbrotCpuGpuBench
                 if (!cs.PrecisionFloat128 && !cs.PrecisionFloat128Fast)
                 {
                     (var render, var abort) = FractalRenderer64.SelectRender(addPixel, () => false, cs.MethodCpuSimd, cs.PrecisionFloat64, cs.ThreadModelMulti);
-                    DoRender = () => render((double)xMin, (double)xMax, (double)yMin, (double)yMax, (double)step, maxiter);
+                    DoRender = () => render(xMin.Hi, xMax.Hi, yMin.Hi, yMax.Hi, step.Hi, maxiter);
                     AbortRender = () => abort();
                 }
                 else
@@ -176,7 +177,7 @@ namespace MandelbrotCpuGpuBench
                 {
                     fixed (int* fixedBuffer = buffer)
                     {
-                        RenderMandelbrotCpp(cpp.MethodGpu, cpp.PrecisionFloat64, cpp.ThreadModelMulti, (double)_zoomLevel, (double)_viewR, (double)_viewI, fixedBuffer, width, height);
+                        RenderMandelbrotCpp(cpp.MethodGpu, cpp.PrecisionFloat64, cpp.ThreadModelMulti, _zoomLevel.Hi, _viewR.Hi, _viewI.Hi, fixedBuffer, width, height);
                     }
                     return true;
                 };
@@ -193,10 +194,10 @@ namespace MandelbrotCpuGpuBench
                 if (!success)
                     return;
 
-                double fullSetPixels = 4 / (double)_zoomLevel;
+                double fullSetPixels = 4 / _zoomLevel.Hi;
                 double meters = _funDistances.PixelsToMeters(fullSetPixels);
 
-                Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Whole Set Size = {Math.Round(meters)} meters (> {_funDistances.PixelsToFunDistance(fullSetPixels)})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / (double)_zoomLevel, 1)}";
+                Title = $"Mandelbrot Rendering Took {_stopwatch.ElapsedMilliseconds}ms ({width}x{height})  Whole Set Size = {Math.Round(meters)} meters (> {_funDistances.PixelsToFunDistance(fullSetPixels)})  Iterations = {maxiter}  Zoom Level = {Math.Round(0.002 / _zoomLevel.Hi, 1)}";
 
                 var temp = (MandelbrotImage as ArrayBitmapSource)?.Buffer;
                 var image = new ArrayBitmapSource(buffer);

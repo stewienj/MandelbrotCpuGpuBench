@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ScalarDecimal.cs" />
     <Compile Remove="ScalarGeneric.cs" />
   </ItemGroup>
 

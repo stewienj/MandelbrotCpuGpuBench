@@ -13,23 +13,23 @@ namespace Swordfish.NET.Maths
     public struct DoubleDouble
     {
         public static char[] BASE_36_TABLE = { //
-			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', //
-			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', //
-			'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', //
-			'U', 'V', 'W', 'X', 'Y', 'Z'          };
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', //
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', //
+            'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', //
+            'U', 'V', 'W', 'X', 'Y', 'Z'          };
 
         public static char[] ZEROES = { //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
-			'0', '0', '0', '0', '0'             };
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', //
+            '0', '0', '0', '0', '0'             };
 
         public static double POSITIVE_INFINITY = Double.MaxValue / 0x08000001;
         public static double NEGATIVE_INFINITY = -DoubleDouble.POSITIVE_INFINITY;
@@ -435,6 +435,21 @@ namespace Swordfish.NET.Maths
             return new DoubleDouble(a, c + (b - a));
         }
 
+        public static DoubleDouble operator +(DoubleDouble x, DoubleDouble y)
+        {
+            double a, b, c, d, e, f;
+            e = x.Hi + y.Hi;
+            d = x.Hi - e;
+            a = x.Lo + y.Lo;
+            f = x.Lo - a;
+            d = ((x.Hi - (d + e)) + (d + y.Hi)) + a;
+            b = e + d;
+            c = ((x.Lo - (f + a)) + (f + y.Lo)) + (d + (e - b));
+            a = b + c;
+            return new DoubleDouble(a, c + (b - a));
+        }
+
+
         public void AddSelf(DoubleDouble y)
         {
             double a, b, c, d, e;
@@ -519,6 +534,20 @@ namespace Swordfish.NET.Maths
             d = ((Hi - (d + e)) + (d - y.Hi)) + g;
             b = e + d;
             c = (d + (e - b)) + ((Lo - (f + g)) + (f - y.Lo));
+            a = b + c;
+            return new DoubleDouble(a, c + (b - a));
+        }
+
+        public static DoubleDouble operator -(DoubleDouble x, DoubleDouble y)
+        {
+            double a, b, c, d, e, f, g;
+            g = x.Lo - y.Lo;
+            f = x.Lo - g;
+            e = x.Hi - y.Hi;
+            d = x.Hi - e;
+            d = ((x.Hi - (d + e)) + (d - y.Hi)) + g;
+            b = e + d;
+            c = (d + (e - b)) + ((x.Lo - (f + g)) + (f - y.Lo));
             a = b + c;
             return new DoubleDouble(a, c + (b - a));
         }
@@ -641,6 +670,22 @@ namespace Swordfish.NET.Maths
             return new DoubleDouble(a, c + (e - a));
         }
 
+        public static DoubleDouble operator *(DoubleDouble x, DoubleDouble y)
+        {
+            double a, b, c, d, e;
+            a = 0x08000001 * x.Hi;
+            a += x.Hi - a;
+            b = x.Hi - a;
+            c = 0x08000001 * y.Hi;
+            c += y.Hi - c;
+            d = y.Hi - c;
+            e = x.Hi * y.Hi;
+            c = (((a * c - e) + (a * d + b * c)) + b * d) + (x.Lo * y.Hi + x.Hi * y.Lo);
+            a = e + c;
+            return new DoubleDouble(a, c + (e - a));
+        }
+
+
         public void MulSelf(DoubleDouble y)
         {
             double a, b, c, d, e;
@@ -759,6 +804,32 @@ namespace Swordfish.NET.Maths
             a = f + b;
             return new DoubleDouble(a, b + (f - a));
         }
+
+        public static DoubleDouble operator /(DoubleDouble x, DoubleDouble y)
+        {
+            double a, b, c, d, e, f, g;
+            f = x.Hi / y.Hi;
+            a = 0x08000001 * y.Hi;
+            a += y.Hi - a;
+            b = y.Hi - a;
+            c = 0x08000001 * f;
+            c += f - c;
+            d = f - c;
+            e = y.Hi * f;
+            c = (((a * c - e) + (a * d + b * c)) + b * d) + y.Lo * f;
+            b = x.Lo - c;
+            d = x.Lo - b;
+            a = x.Hi - e;
+            e = (x.Hi - ((x.Hi - a) + a)) + b;
+            g = a + e;
+            e += (a - g) + ((x.Lo - (d + b)) + (d - c));
+            a = g + e;
+            b = a / y.Hi;
+            f += (e + (g - a)) / y.Hi;
+            a = f + b;
+            return new DoubleDouble(a, b + (f - a));
+        }
+
 
         public void DivSelf(DoubleDouble y)
         {
