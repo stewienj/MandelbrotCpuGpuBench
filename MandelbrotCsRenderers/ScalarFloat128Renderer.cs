@@ -12,27 +12,27 @@ namespace MandelbrotCsRenderers
         {
         }
 
-        protected DoubleDouble limit = new DoubleDouble(4.0);
-        protected DoubleDouble TWO = new DoubleDouble(2);
+        protected Float128 limit = new Float128(4.0);
+        protected Float128 TWO = new Float128(2);
 
-        public override bool RenderSingleThreaded(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
+        public override bool RenderSingleThreaded(Float128 xmin, Float128 xmax, Float128 ymin, Float128 ymax, Float128 step, int maxIterations)
         {
             int yp = 0;
-            for (DoubleDouble y = ymin; y.Sub(ymax).Hi < 0 && !Abort; y = y.Add(step), yp++)
+            for (Float128 y = ymin; y.Sub(ymax).Hi < 0 && !Abort; y = y.Add(step), yp++)
             {
                 if (Abort)
                     return false;
                 int xp = 0;
-                for (DoubleDouble x = xmin; x.Sub(xmax).Hi < 0; x = x.Add(step), xp++)
+                for (Float128 x = xmin; x.Sub(xmax).Hi < 0; x = x.Add(step), xp++)
                 {
-                    DoubleDouble accumx = x;
-                    DoubleDouble accumy = y;
+                    Float128 accumx = x;
+                    Float128 accumy = y;
                     int iters = 0;
-                    DoubleDouble sqabs = new DoubleDouble(0);
+                    Float128 sqabs = new Float128(0);
                     do
                     {
-                        DoubleDouble naccumx = accumx.Sqr().Sub(accumy.Sqr());
-                        DoubleDouble naccumy = TWO.Mul(accumx).Mul(accumy);
+                        Float128 naccumx = accumx.Sqr().Sub(accumy.Sqr());
+                        Float128 naccumy = TWO.Mul(accumx).Mul(accumy);
                         accumx = naccumx.Add(x);
                         accumy = naccumy.Add(y);
                         iters++;
@@ -46,27 +46,27 @@ namespace MandelbrotCsRenderers
         }
 
 
-        public override bool RenderMultiThreaded(DoubleDouble xmin, DoubleDouble xmax, DoubleDouble ymin, DoubleDouble ymax, DoubleDouble step, int maxIterations)
+        public override bool RenderMultiThreaded(Float128 xmin, Float128 xmax, Float128 ymin, Float128 ymax, Float128 step, int maxIterations)
         {
-            DoubleDouble HALF = new DoubleDouble(0.5);
+            Float128 HALF = new Float128(0.5);
 
             //Parallel.For(0, (int)(((ymax - ymin) / step) + .5M), (yp) =>
             Parallel.For(0, ymax.Sub(ymin).Div(step).Add(HALF).IntValue(), (yp) =>
             {
                 if (Abort)
                     return;
-                DoubleDouble y = ymin.Add(step.Mul(yp));
+                Float128 y = ymin.Add(step.Mul(yp));
                 int xp = 0;
-                for (DoubleDouble x = xmin; x.Sub(xmax).Hi < 0; x = x.Add(step), xp++)
+                for (Float128 x = xmin; x.Sub(xmax).Hi < 0; x = x.Add(step), xp++)
                 {
-                    DoubleDouble accumx = x;
-                    DoubleDouble accumy = y;
+                    Float128 accumx = x;
+                    Float128 accumy = y;
                     int iters = 0;
-                    DoubleDouble sqabs = new DoubleDouble(0);
+                    Float128 sqabs = new Float128(0);
                     do
                     {
-                        DoubleDouble naccumx = accumx.Sqr().Sub(accumy.Sqr());
-                        DoubleDouble naccumy = TWO.Mul(accumx).Mul(accumy);
+                        Float128 naccumx = accumx.Sqr().Sub(accumy.Sqr());
+                        Float128 naccumy = TWO.Mul(accumx).Mul(accumy);
                         accumx = naccumx.Add(x);
                         accumy = naccumy.Add(y);
                         iters++;

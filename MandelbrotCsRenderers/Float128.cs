@@ -10,7 +10,7 @@ namespace Swordfish.NET.Maths
      * @see http://crd.lbl.gov/~dhbailey/mpdist/index.html
      * @date 2006/10/22
      */
-    public struct DoubleDouble
+    public struct Float128
     {
         public static char[] BASE_36_TABLE = { //
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', //
@@ -32,14 +32,14 @@ namespace Swordfish.NET.Maths
             '0', '0', '0', '0', '0'             };
 
         public static double POSITIVE_INFINITY = Double.MaxValue / 0x08000001;
-        public static double NEGATIVE_INFINITY = -DoubleDouble.POSITIVE_INFINITY;
+        public static double NEGATIVE_INFINITY = -Float128.POSITIVE_INFINITY;
         public static double HALF_EPSILON = 1.1102230246251565E-16;
         public static double EPSILON = 1.232595164407831E-32;
 
-        public static DoubleDouble PI = new DoubleDouble(3.141592653589793, 1.2246467991473532E-16);
-        public static DoubleDouble E = new DoubleDouble(2.718281828459045, 1.4456468917292502E-16);
-        public static DoubleDouble LOG2 = new DoubleDouble(0.6931471805599453, 2.3190468138462996E-17);
-        public static DoubleDouble INV_LOG2 = new DoubleDouble(1.4426950408889634, 2.0355273740931033E-17);
+        public static Float128 PI = new Float128(3.141592653589793, 1.2246467991473532E-16);
+        public static Float128 E = new Float128(2.718281828459045, 1.4456468917292502E-16);
+        public static Float128 LOG2 = new Float128(0.6931471805599453, 2.3190468138462996E-17);
+        public static Float128 INV_LOG2 = new Float128(1.4426950408889634, 2.0355273740931033E-17);
 
         public double Hi;
         public double Lo;
@@ -48,25 +48,25 @@ namespace Swordfish.NET.Maths
         // ************************ Creation functions ***************************//
         // ***********************************************************************//
 
-        public DoubleDouble()
+        public Float128()
         {
             Hi = 0;
             Lo = 0;
         }
 
-        public DoubleDouble(double d)
+        public Float128(double d)
         {
             Hi = d;
             Lo = 0;
         }
 
-        public DoubleDouble(double hi, double lo)
+        public Float128(double hi, double lo)
         {
             Hi = hi;
             Lo = lo;
         }
 
-        public DoubleDouble(DoubleDouble dd)
+        public Float128(Float128 dd)
         {
             Hi = dd.Hi;
             Lo = dd.Lo;
@@ -84,21 +84,21 @@ namespace Swordfish.NET.Maths
             Lo = lo;
         }
 
-        public void Set(DoubleDouble dd)
+        public void Set(Float128 dd)
         {
             Hi = dd.Hi;
             Lo = dd.Lo;
         }
 
-        public static DoubleDouble Random(Random r)
+        public static Float128 Random(Random r)
         {
-            return new DoubleDouble(r.NextDouble(), r.NextDouble() * DoubleDouble.HALF_EPSILON).Normalize();
+            return new Float128(r.NextDouble(), r.NextDouble() * Float128.HALF_EPSILON).Normalize();
         }
 
-        public static DoubleDouble RandomDynamic(Random r)
+        public static Float128 RandomDynamic(Random r)
         {
-            DoubleDouble x = new DoubleDouble(r.NextDouble(), r.NextDouble() / (1L << (r.Next(11) + 52)));
-            x.MulSelf(DoubleDouble.PowOf2(r.Next(129) - 64));
+            Float128 x = new Float128(r.NextDouble(), r.NextDouble() / (1L << (r.Next(11) + 52)));
+            x.MulSelf(Float128.PowOf2(r.Next(129) - 64));
             x.NormalizeSelf();
             if (r.Next(1) == 1)
             {
@@ -117,11 +117,11 @@ namespace Swordfish.NET.Maths
             {
                 return "NaN";
             }
-            if (Hi >= DoubleDouble.POSITIVE_INFINITY)
+            if (Hi >= Float128.POSITIVE_INFINITY)
             {
                 return "Infinity";
             }
-            if (Hi <= DoubleDouble.NEGATIVE_INFINITY)
+            if (Hi <= Float128.NEGATIVE_INFINITY)
             {
                 return "-Infinity";
             }
@@ -133,15 +133,15 @@ namespace Swordfish.NET.Maths
         // ************************ Temporary functions **************************//
         // ***********************************************************************//
 
-        public DoubleDouble Clone()
+        public Float128 Clone()
         {
-            return new DoubleDouble(Hi, Lo);
+            return new Float128(Hi, Lo);
         }
 
-        public DoubleDouble Normalize()
+        public Float128 Normalize()
         {
             double s = Hi + Lo;
-            return new DoubleDouble(s, Lo + (Hi - s));
+            return new Float128(s, Lo + (Hi - s));
         }
 
         public void NormalizeSelf()
@@ -181,7 +181,7 @@ namespace Swordfish.NET.Maths
             return rhi;
         }
 
-        public static DoubleDouble Min(DoubleDouble x, DoubleDouble y)
+        public static Float128 Min(Float128 x, Float128 y)
         {
             if (x.Hi < y.Hi || (x.Hi == y.Hi && x.Lo < y.Lo))
             {
@@ -190,7 +190,7 @@ namespace Swordfish.NET.Maths
             return y;
         }
 
-        public static DoubleDouble Max(DoubleDouble x, DoubleDouble y)
+        public static Float128 Max(Float128 x, Float128 y)
         {
             if (x.Hi > y.Hi || (x.Hi == y.Hi && x.Lo > y.Lo))
             {
@@ -216,9 +216,9 @@ namespace Swordfish.NET.Maths
         // ************************* Simple functions ****************************//
         // ***********************************************************************//
 
-        public DoubleDouble Round()
+        public Float128 Round()
         {
-            DoubleDouble rounded = new DoubleDouble();
+            Float128 rounded = new Float128();
 
             double rhi = Math.Round(Hi);
 
@@ -260,9 +260,9 @@ namespace Swordfish.NET.Maths
             }
         }
 
-        public DoubleDouble Floor()
+        public Float128 Floor()
         {
-            DoubleDouble floored = new DoubleDouble();
+            Float128 floored = new Float128();
 
             double rhi = Math.Floor(Hi);
 
@@ -296,9 +296,9 @@ namespace Swordfish.NET.Maths
             }
         }
 
-        public DoubleDouble Ceiling()
+        public Float128 Ceiling()
         {
-            DoubleDouble ceilinged = new DoubleDouble();
+            Float128 ceilinged = new Float128();
 
             double rhi = Math.Ceiling(Hi);
 
@@ -332,9 +332,9 @@ namespace Swordfish.NET.Maths
             }
         }
 
-        public DoubleDouble Truncate()
+        public Float128 Truncate()
         {
-            DoubleDouble truncated = new DoubleDouble();
+            Float128 truncated = new Float128();
 
             double rhi = (long)(Hi);
 
@@ -372,9 +372,9 @@ namespace Swordfish.NET.Maths
         // *********************** Calculation functions *************************//
         // ***********************************************************************//
 
-        public DoubleDouble Neg()
+        public Float128 Neg()
         {
-            return new DoubleDouble(-Hi, -Lo);
+            return new Float128(-Hi, -Lo);
         }
 
         public void NegSelf()
@@ -383,13 +383,13 @@ namespace Swordfish.NET.Maths
             Lo = -Lo;
         }
 
-        public DoubleDouble Abs()
+        public Float128 Abs()
         {
             if (Hi < 0)
             {
-                return new DoubleDouble(-Hi, -Lo);
+                return new Float128(-Hi, -Lo);
             }
-            return new DoubleDouble(Hi, Lo);
+            return new Float128(Hi, Lo);
         }
 
         public void AbsSelf()
@@ -401,14 +401,14 @@ namespace Swordfish.NET.Maths
             }
         }
 
-        public DoubleDouble Add(double y)
+        public Float128 Add(double y)
         {
             double a, b, c;
             b = Hi + y;
             a = Hi - b;
             c = ((Hi - (b + a)) + (y + a)) + Lo;
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
         public void AddSelf(double y)
@@ -421,7 +421,7 @@ namespace Swordfish.NET.Maths
             Lo += b - Hi;
         }
 
-        public DoubleDouble Add(DoubleDouble y)
+        public Float128 Add(Float128 y)
         {
             double a, b, c, d, e, f;
             e = Hi + y.Hi;
@@ -432,10 +432,10 @@ namespace Swordfish.NET.Maths
             b = e + d;
             c = ((Lo - (f + a)) + (f + y.Lo)) + (d + (e - b));
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public static DoubleDouble operator +(DoubleDouble x, DoubleDouble y)
+        public static Float128 operator +(Float128 x, Float128 y)
         {
             double a, b, c, d, e, f;
             e = x.Hi + y.Hi;
@@ -446,11 +446,11 @@ namespace Swordfish.NET.Maths
             b = e + d;
             c = ((x.Lo - (f + a)) + (f + y.Lo)) + (d + (e - b));
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
 
-        public void AddSelf(DoubleDouble y)
+        public void AddSelf(Float128 y)
         {
             double a, b, c, d, e;
             a = Hi + y.Hi;
@@ -464,17 +464,17 @@ namespace Swordfish.NET.Maths
             Lo += e - Hi;
         }
 
-        public DoubleDouble AddFast(DoubleDouble y)
+        public Float128 AddFast(Float128 y)
         {
             double a, b, c;
             b = Hi + y.Hi;
             a = Hi - b;
             c = ((Hi - (a + b)) + (a + y.Hi)) + (Lo + y.Lo);
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public void AddSelfFast(DoubleDouble y)
+        public void AddSelfFast(Float128 y)
         {
             double a, b;
             b = Hi + y.Hi;
@@ -484,24 +484,24 @@ namespace Swordfish.NET.Maths
             Lo += b - Hi;
         }
 
-        public DoubleDouble Sub(double y)
+        public Float128 Sub(double y)
         {
             double a, b, c;
             b = Hi - y;
             a = Hi - b;
             c = ((Hi - (a + b)) + (a - y)) + Lo;
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public DoubleDouble SubR(double x)
+        public Float128 SubR(double x)
         {
             double a, b, c;
             b = x - Hi;
             a = x - b;
             c = ((x - (a + b)) + (a - Hi)) - Lo;
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
         public void SubSelf(double y)
@@ -524,7 +524,7 @@ namespace Swordfish.NET.Maths
             Lo += b - Hi;
         }
 
-        public DoubleDouble Sub(DoubleDouble y)
+        public Float128 Sub(Float128 y)
         {
             double a, b, c, d, e, f, g;
             g = Lo - y.Lo;
@@ -535,10 +535,10 @@ namespace Swordfish.NET.Maths
             b = e + d;
             c = (d + (e - b)) + ((Lo - (f + g)) + (f - y.Lo));
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public static DoubleDouble operator -(DoubleDouble x, DoubleDouble y)
+        public static Float128 operator -(Float128 x, Float128 y)
         {
             double a, b, c, d, e, f, g;
             g = x.Lo - y.Lo;
@@ -549,10 +549,10 @@ namespace Swordfish.NET.Maths
             b = e + d;
             c = (d + (e - b)) + ((x.Lo - (f + g)) + (f - y.Lo));
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public void SubSelf(DoubleDouble y)
+        public void SubSelf(Float128 y)
         {
             double a, b, c, d, e;
             c = Lo - y.Lo;
@@ -566,7 +566,7 @@ namespace Swordfish.NET.Maths
             Lo += b - Hi;
         }
 
-        public DoubleDouble SubR(DoubleDouble y)
+        public Float128 SubR(Float128 y)
         {
             double a, b, c, d, e, f, g;
             g = y.Lo - Lo;
@@ -577,10 +577,10 @@ namespace Swordfish.NET.Maths
             b = e + d;
             c = (d + (e - b)) + ((y.Lo - (f + g)) + (f - Lo));
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public void SubRSelf(DoubleDouble y)
+        public void SubRSelf(Float128 y)
         {
             double b, d, e, f, g;
             g = y.Lo - Lo;
@@ -594,17 +594,17 @@ namespace Swordfish.NET.Maths
             Lo = Lo + (b - Hi);
         }
 
-        public DoubleDouble SubFast(DoubleDouble y)
+        public Float128 SubFast(Float128 y)
         {
             double a, b, c;
             b = Hi - y.Hi;
             a = Hi - b;
             c = (((Hi - (a + b)) + (a - y.Hi)) + Lo) - y.Lo;
             a = b + c;
-            return new DoubleDouble(a, c + (b - a));
+            return new Float128(a, c + (b - a));
         }
 
-        public void SubSelfFast(DoubleDouble y)
+        public void SubSelfFast(Float128 y)
         {
             double a, b;
             b = Hi - y.Hi;
@@ -614,9 +614,9 @@ namespace Swordfish.NET.Maths
             Lo += b - Hi;
         }
 
-        public DoubleDouble MulPwrOf2(double y)
+        public Float128 MulPwrOf2(double y)
         {
-            return new DoubleDouble(Hi * y, Lo * y);
+            return new Float128(Hi * y, Lo * y);
         }
 
         public void MulSelfPwrOf2(double y)
@@ -625,7 +625,7 @@ namespace Swordfish.NET.Maths
             Lo *= y;
         }
 
-        public DoubleDouble Mul(double y)
+        public Float128 Mul(double y)
         {
             double a, b, c, d, e;
             a = 0x08000001 * Hi;
@@ -637,7 +637,7 @@ namespace Swordfish.NET.Maths
             e = Hi * y;
             c = (((a * c - e) + (a * d + b * c)) + b * d) + Lo * y;
             a = e + c;
-            return new DoubleDouble(a, c + (e - a));
+            return new Float128(a, c + (e - a));
         }
 
         public void MulSelf(double y)
@@ -655,7 +655,7 @@ namespace Swordfish.NET.Maths
             Lo += e - Hi;
         }
 
-        public DoubleDouble Mul(DoubleDouble y)
+        public Float128 Mul(Float128 y)
         {
             double a, b, c, d, e;
             a = 0x08000001 * Hi;
@@ -667,10 +667,10 @@ namespace Swordfish.NET.Maths
             e = Hi * y.Hi;
             c = (((a * c - e) + (a * d + b * c)) + b * d) + (Lo * y.Hi + Hi * y.Lo);
             a = e + c;
-            return new DoubleDouble(a, c + (e - a));
+            return new Float128(a, c + (e - a));
         }
 
-        public static DoubleDouble operator *(DoubleDouble x, DoubleDouble y)
+        public static Float128 operator *(Float128 x, Float128 y)
         {
             double a, b, c, d, e;
             a = 0x08000001 * x.Hi;
@@ -682,11 +682,11 @@ namespace Swordfish.NET.Maths
             e = x.Hi * y.Hi;
             c = (((a * c - e) + (a * d + b * c)) + b * d) + (x.Lo * y.Hi + x.Hi * y.Lo);
             a = e + c;
-            return new DoubleDouble(a, c + (e - a));
+            return new Float128(a, c + (e - a));
         }
 
 
-        public void MulSelf(DoubleDouble y)
+        public void MulSelf(Float128 y)
         {
             double a, b, c, d, e;
             a = 0x08000001 * Hi;
@@ -701,9 +701,9 @@ namespace Swordfish.NET.Maths
             Lo += e - Hi;
         }
 
-        public DoubleDouble DivPwrOf2(double y)
+        public Float128 DivPwrOf2(double y)
         {
-            return new DoubleDouble(Hi / y, Lo / y);
+            return new Float128(Hi / y, Lo / y);
         }
 
         public void DivSelfPwrOf2(double y)
@@ -712,7 +712,7 @@ namespace Swordfish.NET.Maths
             Lo /= y;
         }
 
-        public DoubleDouble Div(double y)
+        public Float128 Div(double y)
         {
             double a, b, c, d, e, f, g, h;
             f = Hi / y;
@@ -727,7 +727,7 @@ namespace Swordfish.NET.Maths
             h = Hi - g;
             b = (g + ((((Hi - (h + g)) + (h - e)) + Lo) - (((a * c - e) + (a * d + b * c)) + b * d))) / y;
             a = f + b;
-            return new DoubleDouble(a, b + (f - a));
+            return new Float128(a, b + (f - a));
         }
 
         public void DivSelf(double y)
@@ -748,7 +748,7 @@ namespace Swordfish.NET.Maths
             Lo += f - Hi;
         }
 
-        public DoubleDouble divr(double y)
+        public Float128 divr(double y)
         {
             double a, b, c, d, e, f;
             f = y / Hi;
@@ -761,7 +761,7 @@ namespace Swordfish.NET.Maths
             e = Hi * f;
             b = ((y - e) - ((((a * c - e) + (a * d + b * c)) + b * d) + Lo * f)) / Hi;
             a = f + b;
-            return new DoubleDouble(a, b + (f - a));
+            return new Float128(a, b + (f - a));
         }
 
         public void DivrSelf(double y)
@@ -780,7 +780,7 @@ namespace Swordfish.NET.Maths
             Lo += f - Hi;
         }
 
-        public DoubleDouble Div(DoubleDouble y)
+        public Float128 Div(Float128 y)
         {
             double a, b, c, d, e, f, g;
             f = Hi / y.Hi;
@@ -802,10 +802,10 @@ namespace Swordfish.NET.Maths
             b = a / y.Hi;
             f += (e + (g - a)) / y.Hi;
             a = f + b;
-            return new DoubleDouble(a, b + (f - a));
+            return new Float128(a, b + (f - a));
         }
 
-        public static DoubleDouble operator /(DoubleDouble x, DoubleDouble y)
+        public static Float128 operator /(Float128 x, Float128 y)
         {
             double a, b, c, d, e, f, g;
             f = x.Hi / y.Hi;
@@ -827,11 +827,11 @@ namespace Swordfish.NET.Maths
             b = a / y.Hi;
             f += (e + (g - a)) / y.Hi;
             a = f + b;
-            return new DoubleDouble(a, b + (f - a));
+            return new Float128(a, b + (f - a));
         }
 
 
-        public void DivSelf(DoubleDouble y)
+        public void DivSelf(Float128 y)
         {
             double a, b, c, d, e, f, g;
             f = Hi / y.Hi;
@@ -856,7 +856,7 @@ namespace Swordfish.NET.Maths
             Lo += f - Hi;
         }
 
-        public DoubleDouble DivFast(DoubleDouble y)
+        public Float128 DivFast(Float128 y)
         {
             double a, b, c, d, e, f, g;
             f = Hi / y.Hi;
@@ -872,10 +872,10 @@ namespace Swordfish.NET.Maths
             c = Hi - a;
             g = (c + ((((Hi - c) - a) - ((e - a) + b)) + Lo)) / y.Hi;
             a = f + g;
-            return new DoubleDouble(a, g + (f - a));
+            return new Float128(a, g + (f - a));
         }
 
-        public void DivSelfFast(DoubleDouble y)
+        public void DivSelfFast(Float128 y)
         {
             double a, b, c, d, e, f;
             f = Hi / y.Hi;
@@ -894,7 +894,7 @@ namespace Swordfish.NET.Maths
             Lo += f - Hi;
         }
 
-        public DoubleDouble Reciprocal()
+        public Float128 Reciprocal()
         {
             double a, b, c, d, e, f;
             f = 1 / Hi;
@@ -907,7 +907,7 @@ namespace Swordfish.NET.Maths
             e = Hi * f;
             b = ((1 - e) - ((((a * c - e) + (a * d + b * c)) + b * d) + Lo * f)) / Hi;
             a = f + b;
-            return new DoubleDouble(a, b + (f - a));
+            return new Float128(a, b + (f - a));
         }
 
         public void ReciprocalSelf()
@@ -926,7 +926,7 @@ namespace Swordfish.NET.Maths
             Lo += f - Hi;
         }
 
-        public DoubleDouble Sqr()
+        public Float128 Sqr()
         {
             double a, b, c;
             a = 0x08000001 * Hi;
@@ -935,7 +935,7 @@ namespace Swordfish.NET.Maths
             c = Hi * Hi;
             b = ((((a * a - c) + a * b * 2) + b * b) + Hi * Lo * 2) + Lo * Lo;
             a = b + c;
-            return new DoubleDouble(a, b + (c - a));
+            return new Float128(a, b + (c - a));
         }
 
         public void SqrSelf()
@@ -950,11 +950,11 @@ namespace Swordfish.NET.Maths
             Lo += c - Hi;
         }
 
-        public DoubleDouble Sqrt()
+        public Float128 Sqrt()
         {
             if (Hi == 0 && Lo == 0)
             {
-                return new DoubleDouble();
+                return new Float128();
             }
 
             double a, b, c, d, e, f, g, h;
@@ -988,7 +988,7 @@ namespace Swordfish.NET.Maths
             e += a - b;
             f = b + h;
             c = b - f;
-            return new DoubleDouble(f, e + ((b - (f + c)) + (h + c)));
+            return new Float128(f, e + ((b - (f + c)) + (h + c)));
         }
 
         public void SqrtSelf()
@@ -1032,11 +1032,11 @@ namespace Swordfish.NET.Maths
             Lo = e + ((b - (Hi + c)) + (h + c));
         }
 
-        public DoubleDouble SqrtFast()
+        public Float128 SqrtFast()
         {
             if (Hi == 0 && Lo == 0)
             {
-                return new DoubleDouble();
+                return new Float128();
             }
 
             double a, b, c, d, e;
@@ -1052,7 +1052,7 @@ namespace Swordfish.NET.Maths
             c = (a + ((((Hi - (c + a)) + (c - c)) + Lo) - b)) * d * 0.5;
             a = e + c;
             b = e - a;
-            return new DoubleDouble(a, (e - (b + a)) + (b + c));
+            return new Float128(a, (e - (b + a)) + (b + c));
         }
 
         public void SqrtSelfFast()
@@ -1082,11 +1082,11 @@ namespace Swordfish.NET.Maths
         // 0.693147180559945309417232121458174
         // 1.03972077083991796412584818218727
         // 1.03972077083991796312584818218727
-        public DoubleDouble Exp()
+        public Float128 Exp()
         {
             if (Hi > 691.067739)
             {
-                return new DoubleDouble(Double.PositiveInfinity);
+                return new Float128(Double.PositiveInfinity);
             }
 
             double a, b, c, d, e, f, g = 0.5, h = 0, i, j, k, l, m, n, o, p, q = 2, r = 1;
@@ -1196,7 +1196,7 @@ namespace Swordfish.NET.Maths
             f = ((c - (f + e)) + (f + i)) + a;
             c = e + f;
             d = (f + (e - c)) + ((d - (b + a)) + (b + j));
-            return new DoubleDouble(c * r, d * r);
+            return new Float128(c * r, d * r);
         }
 
         public void ExpSelf()
@@ -1317,11 +1317,11 @@ namespace Swordfish.NET.Maths
             Hi *= r;
         }
 
-        public DoubleDouble Log()
+        public Float128 Log()
         {
             if (Hi <= 0.0)
             {
-                return new DoubleDouble(Double.NaN);
+                return new Float128(Double.NaN);
             }
 
             double a, b, c, d, e, f, g = 0.5, h = 0, i, j, k, l, m, n, o, p, q = 2, r = 1, s;
@@ -1448,7 +1448,7 @@ namespace Swordfish.NET.Maths
             d = a - c;
             b += ((a - (c + d)) + (s + d));
             a = c + b;
-            return new DoubleDouble(a, b + (c - a));
+            return new Float128(a, b + (c - a));
         }
 
         public void LogSelf()
@@ -1591,16 +1591,16 @@ namespace Swordfish.NET.Maths
             return ((long)y + 0xFF) << 52;
         }
 
-        public DoubleDouble Pow(int y)
+        public Float128 Pow(int y)
         {
-            DoubleDouble temp;
+            Float128 temp;
             int e = y;
             if (e < 0)
             {
                 e = -y;
             }
-            temp = new DoubleDouble(Hi, Lo);
-            DoubleDouble prod = new DoubleDouble(1);
+            temp = new Float128(Hi, Lo);
+            Float128 prod = new Float128(1);
             while (e > 0)
             {
                 if ((e & 1) > 0)
@@ -1619,13 +1619,13 @@ namespace Swordfish.NET.Maths
 
         public void PowSelf(int y)
         {
-            DoubleDouble temp;
+            Float128 temp;
             int e = y;
             if (e < 0)
             {
                 e = -y;
             }
-            temp = new DoubleDouble(Hi, Lo);
+            temp = new Float128(Hi, Lo);
             Hi = 1;
             Lo = 0;
             while (e > 0)
@@ -1643,7 +1643,7 @@ namespace Swordfish.NET.Maths
             }
         }
 
-        public DoubleDouble pow(double y)
+        public Float128 pow(double y)
         {
             return Log().Mul(y).Exp();
         }
@@ -1655,27 +1655,27 @@ namespace Swordfish.NET.Maths
             ExpSelf();
         }
 
-        public DoubleDouble Pow(DoubleDouble y)
+        public Float128 Pow(Float128 y)
         {
             return Log().Mul(y).Exp();
         }
 
-        public void PowSelf(DoubleDouble y)
+        public void PowSelf(Float128 y)
         {
             LogSelf();
             MulSelf(y);
             ExpSelf();
         }
 
-        public DoubleDouble Root(int y)
+        public Float128 Root(int y)
         {
             if (Hi == 0 && Lo == 0)
             {
-                return new DoubleDouble();
+                return new Float128();
             }
             if (Hi < 0.0 && ((y & 1) == 0))
             {
-                return new DoubleDouble(Double.NaN);
+                return new Float128(Double.NaN);
             }
 
             if (y == 1)
@@ -1715,7 +1715,7 @@ namespace Swordfish.NET.Maths
                 e += a - b;
                 f = b + h;
                 c = b - f;
-                return new DoubleDouble(f, e + ((b - (f + c)) + (h + c)));
+                return new Float128(f, e + ((b - (f + c)) + (h + c)));
             }
 
             // Have to scope this, because original code used single letter variables
@@ -1817,7 +1817,7 @@ namespace Swordfish.NET.Maths
                 h = e * i;
                 m = ((1 - h) - ((((l * f - h) + (l * g + d * f)) + d * g) + m * i)) / e;
                 l = i + m;
-                return new DoubleDouble(l, m + (i - l));
+                return new Float128(l, m + (i - l));
             }
         }
 
@@ -1978,7 +1978,7 @@ namespace Swordfish.NET.Maths
             }
         }
 
-        public DoubleDouble Root(double y)
+        public Float128 Root(double y)
         {
             return Log().Div(y).Exp();
         }
@@ -1990,7 +1990,7 @@ namespace Swordfish.NET.Maths
             ExpSelf();
         }
 
-        public DoubleDouble Rootr(double y)
+        public Float128 Rootr(double y)
         {
             return divr(Math.Log(y)).Exp();
         }
@@ -2001,12 +2001,12 @@ namespace Swordfish.NET.Maths
             ExpSelf();
         }
 
-        public DoubleDouble Root(DoubleDouble y)
+        public Float128 Root(Float128 y)
         {
             return Log().Div(y).Exp();
         }
 
-        public void RootSelf(DoubleDouble y)
+        public void RootSelf(Float128 y)
         {
             LogSelf();
             DivSelf(y);

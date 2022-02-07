@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Swordfish.NET.Maths
 {
-    public static class DoubleDoubleExtensions
+    public static class Float128Extensions
     {
 
         /**
@@ -18,7 +18,7 @@ namespace Swordfish.NET.Maths
          * <br>
          * Where: <code>minPrecision = floor(105 / log2(intBase) + 1)</code>
          */
-        public static string ToString(this DoubleDouble dd, int intBase)
+        public static string ToString(this Float128 dd, int intBase)
         {
             double digitsPerBit = Math.Log(2) / Math.Log(intBase);
             int minPrecision = (int)Math.Floor(105.0 * digitsPerBit + 2);
@@ -72,13 +72,13 @@ namespace Swordfish.NET.Maths
                 outString.Append('.');
                 if (left > 0)
                 {
-                    if (DoubleDouble.ZEROES.Length < left)
+                    if (Float128.ZEROES.Length < left)
                     {
                         //System.err.println(left);
                     }
                     else
                     {
-                        outString.Append(DoubleDouble.ZEROES, 0, left);
+                        outString.Append(Float128.ZEROES, 0, left);
                     }
                 }
                 outString.Append(chars, right, precision - right);
@@ -86,7 +86,7 @@ namespace Swordfish.NET.Maths
             return outString.ToString();
         }
 
-        private static int to_digits(this DoubleDouble dd, char[] s, int precision, int intBase)
+        private static int to_digits(this Float128 dd, char[] s, int precision, int intBase)
         {
             int halfBase = (intBase + 1) >> 1;
 
@@ -101,10 +101,10 @@ namespace Swordfish.NET.Maths
             }
 
             // First determine the (approximate) exponent.
-            DoubleDouble temp = dd.Abs();
+            Float128 temp = dd.Abs();
             int exp = (int)Math.Floor(Math.Log(temp.Hi) / Math.Log(intBase));
 
-            DoubleDouble p = new DoubleDouble(intBase);
+            Float128 p = new Float128(intBase);
             if (exp < -300)
             {
                 temp.MulSelf(p.Pow(150));
@@ -190,7 +190,7 @@ namespace Swordfish.NET.Maths
             // Convert to ASCII.
             for (int i = 0; i < precision; i++)
             {
-                s[i] = DoubleDouble.BASE_36_TABLE[s[i]];
+                s[i] = Float128.BASE_36_TABLE[s[i]];
             }
 
             // If first digit became zero, and exp > 0, shift left.

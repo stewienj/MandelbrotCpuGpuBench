@@ -13,9 +13,9 @@ namespace MandelbrotCpuGpuBench
 {
     public class Workspace : INotifyPropertyChanged
     {
-        private DoubleDouble _zoomLevel = new DoubleDouble(0.001);
-        private DoubleDouble _viewR = new DoubleDouble(0.001643721971153);
-        private DoubleDouble _viewI = new DoubleDouble(0.822467633298876);
+        private Float128 _zoomLevel = new Float128(0.001);
+        private Float128 _viewR = new Float128(0.001643721971153);
+        private Float128 _viewI = new Float128(0.822467633298876);
         private int _bufferWidth = 0;
         private int _bufferHeight = 0;
         private Stopwatch _stopwatch = new Stopwatch();
@@ -69,25 +69,25 @@ namespace MandelbrotCpuGpuBench
 
         public void Move(Vector distance)
         {
-            _viewR += new DoubleDouble(distance.X) * _zoomLevel;
-            _viewI += new DoubleDouble(distance.Y) * _zoomLevel;
+            _viewR += new Float128(distance.X) * _zoomLevel;
+            _viewI += new Float128(distance.Y) * _zoomLevel;
             OnParametersChanged();
         }
 
         public void Zoom(int zDelta, Point location)
         {
-            (DoubleDouble X, DoubleDouble Y) oldDistance = (new DoubleDouble(location.X - _bufferWidth / 2.0) * _zoomLevel, new DoubleDouble(location.Y - _bufferHeight / 2.0)*_zoomLevel);
-            DoubleDouble factor = new DoubleDouble(1.2);
-            DoubleDouble offset = new DoubleDouble(0);
+            (Float128 X, Float128 Y) oldDistance = (new Float128(location.X - _bufferWidth / 2.0) * _zoomLevel, new Float128(location.Y - _bufferHeight / 2.0)*_zoomLevel);
+            Float128 factor = new Float128(1.2);
+            Float128 offset = new Float128(0);
             if (zDelta > 0)
             {
                 _zoomLevel /= factor;
-                offset = (new DoubleDouble(1.0) - new DoubleDouble(1.0) / factor);
+                offset = (new Float128(1.0) - new Float128(1.0) / factor);
             }
             else
             {
                 _zoomLevel *= factor;
-                offset = new DoubleDouble(1.0) - factor;
+                offset = new Float128(1.0) - factor;
             }
 
             // Correct for the position of the mouse
@@ -145,11 +145,11 @@ namespace MandelbrotCpuGpuBench
 
             int halfHeight = (int)(Math.Floor(height / 2.0));
             int halfWidth = (int)(Math.Floor(width / 2.0));
-            DoubleDouble xMin = new DoubleDouble(-halfWidth) * _zoomLevel + _viewR;
-            DoubleDouble xMax = new DoubleDouble(halfWidth) * _zoomLevel + _viewR;
-            DoubleDouble yMin = new DoubleDouble(-halfHeight) * _zoomLevel + _viewI;
-            DoubleDouble yMax = new DoubleDouble(halfHeight) * _zoomLevel + _viewI;
-            DoubleDouble step = _zoomLevel;
+            Float128 xMin = new Float128(-halfWidth) * _zoomLevel + _viewR;
+            Float128 xMax = new Float128(halfWidth) * _zoomLevel + _viewR;
+            Float128 yMin = new Float128(-halfHeight) * _zoomLevel + _viewI;
+            Float128 yMax = new Float128(halfHeight) * _zoomLevel + _viewI;
+            Float128 step = _zoomLevel;
 
             Func<bool> DoRender = null;
             Action AbortRender = null;
