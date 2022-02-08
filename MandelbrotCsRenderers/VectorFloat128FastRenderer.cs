@@ -62,12 +62,12 @@ namespace MandelbrotCsRenderers
                     Vector<double> increment = Vector<double>.One;
                     do
                     {
-                        Float128FastVector naccumx = accumx * accumx - accumy * accumy;
-                        Float128FastVector naccumy = accumx * accumy + accumx * accumy;
+                        Float128FastVector naccumx = accumx.Sqr() - accumy.Sqr();
+                        Float128FastVector naccumy = (accumx * accumy).MulPwrOf2(2);
                         accumx = naccumx + vx;
                         accumy = naccumy + vy;
                         viters += increment;
-                        Float128FastVector sqabs = accumx * accumx + accumy * accumy;
+                        Float128FastVector sqabs = accumx.Sqr() + accumy.Sqr();
                         Vector<double> vCond = Vector.LessThanOrEqual<double>(sqabs.Hi, vlimit.Hi) &
                             Vector.LessThanOrEqual<double>(viters, vmax_iters);
                         increment = increment & vCond;
@@ -83,37 +83,36 @@ namespace MandelbrotCsRenderers
         // For a well commented version, go see VectorFloatRenderer.RenderSingleThreadedWithADT in VectorFloat.cs
         public override  bool RenderSingleThreaded(Float128 xmin, Float128 xmax, Float128 ymin, Float128 ymax, Float128 step, int maxIterations)
         {
-            /*
             Vector<double> vmax_iters = new Vector<double>((double)maxIterations);
-            Vector<double> vlimit = new Vector<double>(limit);
-            Vector<double> vstep = new Vector<double>(step);
-            Vector<double> vinc = new Vector<double>((double)Vector<double>.Count * step);
-            Vector<double> vxmax = new Vector<double>(xmax);
-            Vector<double> vxmin = VectorHelper.Create(i => xmin + step * i);
+            Float128FastVector vlimit = new Float128FastVector(limit);
+            Float128FastVector vstep = new Float128FastVector(step);
+            Float128FastVector vinc = new Float128FastVector(new Float128((double)Vector<double>.Count) * step);
+            Float128FastVector vxmax = new Float128FastVector(xmax);
+            Float128FastVector vxmin = Create(i => xmin + step * new Float128((double)i));
 
-            double y = ymin;
+            Float128 y = ymin;
             int yp = 0;
-            for (Vector<double> vy = new Vector<double>(ymin); y <= ymax && !Abort; vy += vstep, y += step, yp++)
+            for (Float128FastVector vy = new Float128FastVector(ymin); (y - ymax).Hi < 0 && !Abort; vy += vstep, y += step, yp++)
             {
                 if (Abort)
                     return false;
                 int xp = 0;
-                for (Vector<double> vx = vxmin; Vector.LessThanOrEqualAll(vx, vxmax); vx += vinc, xp += Vector<double>.Count)
+                for (Float128FastVector vx = vxmin; Float128FastVector.LessThanOrEqualAll(vx, vxmax); vx += vinc, xp += Vector<double>.Count)
                 {
-                    Vector<double> accumx = vx;
-                    Vector<double> accumy = vy;
+                    Float128FastVector accumx = vx;
+                    Float128FastVector accumy = vy;
 
                     Vector<double> viters = Vector<double>.Zero;
                     Vector<double> increment = Vector<double>.One;
                     do
                     {
-                        Vector<double> naccumx = accumx * accumx - accumy * accumy;
-                        Vector<double> naccumy = accumx * accumy + accumx * accumy;
+                        Float128FastVector naccumx = accumx.Sqr() - accumy.Sqr();
+                        Float128FastVector naccumy = (accumx * accumy).MulPwrOf2(2);
                         accumx = naccumx + vx;
                         accumy = naccumy + vy;
                         viters += increment;
-                        Vector<double> sqabs = accumx * accumx + accumy * accumy;
-                        Vector<double> vCond = Vector.LessThanOrEqual<double>(sqabs, vlimit) &
+                        Float128FastVector sqabs = accumx.Sqr() + accumy.Sqr();
+                        Vector<double> vCond = Vector.LessThanOrEqual<double>(sqabs.Hi, vlimit.Hi) &
                             Vector.LessThanOrEqual<double>(viters, vmax_iters);
                         increment = increment & vCond;
                     } while (increment != Vector<double>.Zero);
@@ -121,7 +120,6 @@ namespace MandelbrotCsRenderers
                     viters.ForEach((iter, elemNum) => DrawPixel(xp + elemNum, yp, (int)iter));
                 }
             }
-            */
             return true;
         }
     }

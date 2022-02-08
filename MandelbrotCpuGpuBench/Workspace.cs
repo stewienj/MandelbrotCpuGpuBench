@@ -157,7 +157,7 @@ namespace MandelbrotCpuGpuBench
             if (Options.LanguageCs)
             {
                 var cs = Options.Cs;
-                if (!cs.PrecisionFloat128 && !cs.PrecisionFloat128Fast)
+                if (!cs.PrecisionFloat128)
                 {
                     (var render, var abort) = FractalRenderer64.SelectRender(addPixel, () => false, cs.MethodCpuSimd, cs.PrecisionFloat64, cs.ThreadModelMulti);
                     DoRender = () => render(xMin.Hi, xMax.Hi, yMin.Hi, yMax.Hi, step.Hi, maxiter);
@@ -165,7 +165,7 @@ namespace MandelbrotCpuGpuBench
                 }
                 else
                 {
-                    (var render, var abort) = FractalRenderer128.SelectRender128(addPixel, () => false, cs.MethodCpuSimd, cs.ThreadModelMulti, cs.PrecisionFloat128Fast);
+                    (var render, var abort) = FractalRenderer128.SelectRender128(addPixel, () => false, cs.MethodCpuSimd, cs.ThreadModelMulti);
                     DoRender = () => render(xMin, xMax, yMin, yMax, step, maxiter);
                     AbortRender = () => abort();
                 }

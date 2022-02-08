@@ -70,12 +70,5 @@ namespace MandelbrotCpuGpuBench
             get => _precisionFloat128;
             set => SetProperty(ref _precisionFloat128, value);
         }
-
-        private bool _precisionFloat128Fast = false;
-        public bool PrecisionFloat128Fast
-        {
-            get => _precisionFloat128Fast;
-            set => SetProperty(ref _precisionFloat128Fast, value);
-        }
     }
 }

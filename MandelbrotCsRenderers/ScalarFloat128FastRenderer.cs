@@ -13,7 +13,6 @@ namespace MandelbrotCsRenderers
         }
 
         protected Float128 limit = new Float128(4.0);
-        protected Float128 TWO = new Float128(2);
 
 
         public override bool RenderSingleThreaded(Float128 xmin, Float128 xmax, Float128 ymin, Float128 ymax, Float128 step, int maxIterations)
@@ -33,7 +32,7 @@ namespace MandelbrotCsRenderers
                     do
                     {
                         Float128 naccumx = accumx.Sqr().SubFast(accumy.Sqr());
-                        Float128 naccumy = TWO.Mul(accumx).Mul(accumy);
+                        Float128 naccumy = accumx.Mul(accumx).MulPwrOf2(2);
                         accumx = naccumx.AddFast(x);
                         accumy = naccumy.AddFast(y);
                         iters++;

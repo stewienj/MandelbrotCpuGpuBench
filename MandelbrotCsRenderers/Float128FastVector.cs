@@ -73,6 +73,19 @@ namespace MandelbrotCsRenderers
             return new Float128FastVector(a, c + (e - a));
         }
 
+        public Float128FastVector Sqr()
+        {
+            Vector<double> a, b, c;
+            a = 0x08000001 * Hi;
+            a += Hi - a;
+            b = Hi - a;
+            c = Hi * Hi;
+            b = ((((a * a - c) + a * b * 2) + b * b) + Hi * Lo * 2) + Lo * Lo;
+            a = b + c;
+            return new Float128FastVector(a, b + (c - a));
+        }
+
+
         public static Float128FastVector operator &(Float128FastVector x, Float128FastVector y)
         {
             return new Float128FastVector(x.Hi & y.Hi, x.Lo & y.Lo);
@@ -88,6 +101,11 @@ namespace MandelbrotCsRenderers
             {
                 return Vector.LessThanOrEqualAll(x.Lo, y.Lo);
             }
+        }
+
+        public Float128FastVector MulPwrOf2(double y)
+        {
+            return new Float128FastVector(Hi * y, Lo * y);
         }
 
         /*

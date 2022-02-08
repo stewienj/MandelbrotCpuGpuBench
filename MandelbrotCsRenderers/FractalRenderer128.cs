@@ -19,17 +19,15 @@ namespace MandelbrotCsRenderers
 
         public abstract bool RenderSingleThreaded(Float128 xmin, Float128 xmax, Float128 ymin, Float128 ymax, Float128 step, int maxIterations);
 
-        public static (Render128, Action) SelectRender128(Action<int, int, int> draw, Func<bool> abort, bool useVectorTypes, bool isMultiThreaded, bool useFast)
+        public static (Render128, Action) SelectRender128(Action<int, int, int> draw, Func<bool> abort, bool useVectorTypes, bool isMultiThreaded)
         {
             Render128 render;
             FractalRenderer128 r;
 
-            r = (useVectorTypes, useFast) switch
+            r = (useVectorTypes) switch
             {
-                (false, false) => new ScalarFloat128Renderer(draw, abort),
-                (false, true) => new ScalarFloat128FastRenderer(draw, abort),
-                (true, false) => new VectorFloat128Renderer(draw, abort),
-                (true, true) => new VectorFloat128FastRenderer(draw, abort),
+                (false) => new ScalarFloat128FastRenderer(draw, abort),
+                (true) => new VectorFloat128FastRenderer(draw, abort),
             };
 
             
