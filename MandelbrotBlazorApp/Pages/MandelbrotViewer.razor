@@ -1,0 +1,12 @@
+﻿@page "/mandelbrotviewer"
+@using Aptacode.BlazorCanvas
+@inherits MandelbrotViewerBase
+
+<h3>MandelbrotViewer</h3>
+
+<!-- Maybe add some window handlers like seen here -->
+<!-- https://swharden.com/blog/2021-01-07-blazor-canvas-animated-graphics/ -->
+
+<BlazorCanvas @ref="Canvas">
+    <canvas width="@Width" height="@Height"></canvas>
+</BlazorCanvas>
